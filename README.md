@@ -3,6 +3,17 @@
 <!-- for Joplin users -->
 <!-- ${toc} -->
 
+## Usage
+
+Clone the repo and launch the script with 
+
+```sh
+clone https://github.com/nicgen/git_audit_z01P24.git
+bash git.sh
+```
+
+Fill the prompt and voilà
+
 ## Links
 
 > Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency.
