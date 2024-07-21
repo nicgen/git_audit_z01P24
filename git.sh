@@ -20,6 +20,7 @@ function drawline {
 # PROMPTS
 # ------------------------------------------
 # project path
+# todo if folder doesn't exists
 echo "Choose the directory of your git project:"
 while true ; do
     read -r -e -p "Path: " filepath
@@ -97,16 +98,12 @@ while true; do
         * ) echo "Please answer yes or no.";;
     esac
 done
-
 drawline
-
-printf "$BG_HIGHLIGHT%s$RST\n" "Branching"
 
 # CORE
 # ------------------------------------------
-^printf\s"\$BG_HIGHLIGHT\s([\w]+)\$RST\\n"
 
-
+printf "$BG_HIGHLIGHT%s$RST\n" "Branching"
 printf "$BG_HIGHLIGHT%s$RST\n" "Setting Up Git"
 drawline
 # ------------------------------------------
@@ -294,14 +291,18 @@ printf "$HIGHLIGHT%s$RST\n" "Tagging and Removing Commits"
 git tag oops
 printf "$HIGHLIGHT%s$RST\n" "Ensure that the HEAD points to v1"
 git reset --hard v1
+git checkout $primary_branch
 
 printf "$HIGHLIGHT%s$RST\n" "Displaying Logs with Deleted Commits"
 git log --all --oneline  --grep="revert"
-# git reflog
 
 printf "$HIGHLIGHT%s$RST\n" "Cleaning Unreferenced Commits"
+# 1. reflog
+git reflog expire --expire-unreachable=now --all
 # 2. Remove any unreachable objects
+# git gc --prune=now
 git gc --prune=now -q
+
 # If you want to be extra thorough:
 # git gc --aggressive --prune=now
 
@@ -324,7 +325,7 @@ drawline
 echo "Moving hello.sh"
 
 # move the program hello.sh into a lib/
-mkdir "$user_repo""lib"
+mkdir "$user_repo""hello/lib"
 git mv hello.sh lib/
 git commit -m "Move hello.sh to lib/ directory"
 
@@ -508,6 +509,8 @@ git merge --no-edit greet
 
 # pause to explain fast-forwarding and the difference between merging and rebasing.
 # read -rp "Explain fast-forwarding and the difference between merging and rebasing" </dev/tty
+
+exit 0
 
 printf "$BG_HIGHLIGHT%s$RST\n" "Local and remote repositories"
 drawline
