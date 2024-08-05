@@ -24,6 +24,8 @@ Fill the prompt and voilà
 
 ## Lexical for git
 
+- [gitglossary - A Git Glossary](https://git-scm.com/docs/gitglossary)
+
 ### Staging concept:
 
 - **Making Changes**: You edit your files in your working directory using your preferred text editor or IDE. These changes exist locally on your machine but haven't been registered with Git yet.
@@ -279,7 +281,7 @@ Tagging and Removing Commits
 git tag oops
 ```
 
-Displaying Logs with Deleted Commits
+Displaying Logs with Deleted Commits (focusing on the commit tagged oops)
 
 ```sh
 # display all logs
@@ -291,8 +293,12 @@ git log --all --oneline --grep="revert"
 Cleaning Unreferenced Commits
 
 ```sh
-git gc --prune=now -q
+git reflog expire --expire-unreachable=now --all
+git gc --prune=now --aggressive
 ```
+
+> Reflog: A **reflog** shows the local "history" of a ref. In other words, it can tell you what the 3rd last revision in this repository was, and what was the current state in this repository. [official doc](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefreflogareflog)
+
 
 ## Move it
 
