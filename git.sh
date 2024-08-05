@@ -1,180 +1,365 @@
 #!/usr/bin/env bash
 
+# Notes
+# wait, waitpid, waitid - wait for process to change state
+# used for some process
+
+# I'm using  `cmd > /dev/null` as a trashbin. Anything written on /dev/null will disappear, it is often called the black hole of Linux.
+# Used for not showing some output, i our case it would overload the screen.
+
+# ---------------------------------------------------------------------------
 # VARS
-# ------------------------------------------
+# ---------------------------------------------------------------------------\
+
 # main or master?
 # https://www.zdnet.com/article/github-to-replace-master-with-main-starting-next-month/
 primary_branch=main
-HIGHLIGHT="\e[34m"
-PROMPT_HIGHLIGHT="\e[32m"
-RST="\e[0m"
-BG_HIGHLIGHT="\e[44m"
 
-# FUNCTIONS
-# ------------------------------------------
-# draw a line
-function drawline {
-  printf '\e[37m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+# colors
+HIGHLIGHT="\e[34m"
+BG_HIGHLIGHT="\e[44m"
+PROMPT_HIGHLIGHT="\e[32m"
+
+BLACK="\e[30m"
+RED="\e[31m"
+WHITE="\e[37m"
+BG_WHITE="\e[47m"
+
+# Style
+BOLD='\e[1m'
+UNDR='\e[4m'
+DIM="\E[2m"
+
+# Reset
+RST="\e[0m"
+
+PrintGitLogo(){
+echo -e "\n\n\n
+${RED}⠀⠀⠀⠀⠀⢀⣤⡀⠀⠀⠀⠀⠀${BLACK}⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⠀⠀⠀⠀⠀⠀
+${RED}⠀⠀⠀⠀⣀⠻⣿⣿⣦⡀⠀⠀⠀${BLACK}⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠿⠃⠀⣴⡆⠀⠀
+${RED}⠀⠀⣠⣾⣿⣷⠉⢹⣿⣿⣆⠀⠀${BLACK}⠀⠀⢠⣴⣶⣶⣶⣶⠰⣶⣶⡆⣾⣿⣷⣶⡇
+${RED}⢠⣾⣿⣿⣿⣿⡇⣧⡙⠻⣿⣷⡄${BLACK}⠀⠀⣿⣿⠀⢈⣿⡇⠀⢸⣿⡇⢸⣿⡇⠀⠀
+${RED}⠈⢻⣿⣿⣿⣿⡇⣿⣧⣴⣿⡿⠃${BLACK}⠀⠀⢘⣿⠿⠿⠟⠁⠀⢸⣿⡇⢸⣿⣇⢀⡀
+${RED}⠀⠀⠙⢿⣿⣿⡀⣸⣿⣿⠋⠀⠀${BLACK}⠀⠀⣻⣿⣿⣿⣿⣶⠸⠿⠿⠿⠀⠻⠿⠟⠃
+${RED}⠀⠀⠀⠀⠙⢿⣿⣿⠟⠁⠀⠀⠀${BLACK}⠀⠀⢿⣧⣤⣤⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀
+${RED}⠀⠀⠀⠀⠀⠀⠙⠁⠀⠀⠀⠀⠀${BLACK}⠀⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n$RST"
 }
 
-# PROMPTS
-# ------------------------------------------
-# project path
-# todo if folder doesn't exists
-echo "Choose the directory of your git project:"
-while true ; do
-    read -r -e -p "Path: " filepath
-    if [ -d "$filepath" ] ; then
-        break
-    fi
-    echo "$filepath is not a directory..."
-done
-user_repo=${filepath}
-echo Selected: "$user_repo"
+# ---------------------------------------------------------------------------
+# FUNCTIONS
+# ---------------------------------------------------------------------------
 
-drawline
+# draw a line
+function drawline {
+  printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+}
 
-# choice editor
-names=(Vscode Codium)
-selected=()
-PS3='Which code editor do you use? '
-select name in "${names[@]}" ; do
-    for reply in $REPLY ; do
-        selected+=(${names[reply - 1]})
-    done
-    [[ $selected ]] && break
-done
-code_editor=${selected[@]}
-if [ "$code_editor" == "Vscode" ]; then
-  code_launch=code
-else
-  code_launch=codium
-fi
+function PrintTitle {
+  # printf "\n${BG_HIGHLIGHT}%s${RST}\n"
+  printf "\n\n$PROMPT_HIGHLIGHT$BOLD$UNDR%s$RST\n" "$1"
+  drawline
+}
 
-echo Selected: "$code_editor"
+# print audit question
+function PrintQ {
+  # printf "\n${BG_HIGHLIGHT}%s${RST}\n"
+  printf "\n\n$PROMPT_HIGHLIGHT%s$RST\n\n" "$1"
+}
 
-drawline
+# for printing the files
+function PrintCmd {
+  printf "command: $DIM%s$RST\n\n" "$1"
+}
 
-# choice repository
-names=(Github Gitea)
-selected=()
-PS3='Which Git hosting service do you use? '
-select name in "${names[@]}" ; do
-    for reply in $REPLY ; do
-        selected+=(${names[reply - 1]})
-    done
-    [[ $selected ]] && break
-done
-remote_git=${selected[@]}
-# echo Selected: "$remote_git"
+# for printing the files
+function CatFile {
+  printf "\n$DIM---%s$RST\n" "$1"
+  cat -n "$1"
+  printf "$DIM---$RST\n"
+}
 
-drawline
+# check status and log GitStatus [log num]
+function GitStatus {
+  if [ $# -eq 0 ]
+  then
+    printf "$DIM%s$RST\n" "Git status:"
+    git status
+  else
+    printf "$DIM%s$RST\n" "Git status:"
+    git status
+    echo ""
+    printf "$DIM%s$RST\n" "Git logs:"
+    git log --oneline -"$1"
+  fi
+}
 
-read -p "Enter your $remote_git repository: " remote_url
+# ! commented for testing purpose [START]
 
-drawline
+# # check if path exists and create stock it in a variable
+# ensure_path() {
+#     local input_path="$1"
+#     local variable_name="$2"
 
-read -p "Enter your $remote_git account name: " user_name
+#     # Add a trailing / if not already present
+#     if [[ "${input_path}" != */ ]]; then
+#         input_path="${input_path}/"
+#     fi
 
-drawline
+#     # Check if the directory exists, create it if not
+#     if [[ ! -d "${input_path}" ]]; then
+#         mkdir -p "${input_path}"
+#     fi
 
-read -p "Enter your $remote_git account email: " user_email
+#     # Assign the path to the specified variable
+#     eval "${variable_name}='${input_path}'"
+# }
 
-drawline
+# # ---------------------------------------------------------------------------
+# # PROMPTS
+# # ---------------------------------------------------------------------------
 
-echo "Please check your answers:"
-printf "The directory of this project: $PROMPT_HIGHLIGHT%s$RST\n" "$user_repo"
-printf "Your code editor:  $PROMPT_HIGHLIGHT%s$RST\n" "$code_editor" 
-printf "Your remote repository: $PROMPT_HIGHLIGHT%s$RST\n" "$remote_url" 
-printf "Your remote repository name: $PROMPT_HIGHLIGHT%s$RST\n" "$user_name"  
-printf "Your remote repository email: $PROMPT_HIGHLIGHT%s$RST\n" "$user_email"  
+# # project path
+# # todo if folder doesn't exists
+# echo "Choose the directory of your git project:"
+# while true ; do
+#     read -r -e -p "Path: " filepath
+#     if [[ "${filepath}" != */ ]]; then
+#         filepath="${filepath}/"
+#     fi
+#     if [ -d "$filepath" ] ; then
+#         break
+#     else
+#     fi
+#     echo "$filepath is not a directory..."
+# done
+# user_repo=${filepath}
+# echo Selected: "$user_repo"
 
-# echo Your username is $username, we will not display your password
-while true; do
-    read -p "Are these informations corrects? " yn
-    case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-drawline
+# drawline
 
-# CORE
-# ------------------------------------------
+# # choice editor
+# names=(Vscode Codium)
+# selected=()
+# PS3='Which code editor do you use? '
+# select name in "${names[@]}" ; do
+#     for reply in $REPLY ; do
+#         selected+=(${names[reply - 1]})
+#     done
+#     [[ $selected ]] && break
+# done
+# code_editor=${selected[@]}
+# if [ "$code_editor" == "Vscode" ]; then
+#   code_launch=code
+# else
+#   code_launch=codium
+# fi
 
-printf "$BG_HIGHLIGHT%s$RST\n" "Branching"
-printf "$BG_HIGHLIGHT%s$RST\n" "Setting Up Git"
-drawline
-# ------------------------------------------
-printf "$HIGHLIGHT%s$RST\n" "Check if git is installed"
+# echo Selected: "$code_editor"
+
+# drawline
+
+# # choice repository
+# names=(Github Gitea)
+# selected=()
+# PS3='Which Git hosting service do you use? '
+# select name in "${names[@]}" ; do
+#     for reply in $REPLY ; do
+#         selected+=(${names[reply - 1]})
+#     done
+#     [[ $selected ]] && break
+# done
+# remote_git=${selected[@]}
+# # echo Selected: "$remote_git"
+
+# drawline
+
+# read -p "Enter your $remote_git repository: " remote_url
+
+# drawline
+
+# read -p "Enter your $remote_git account name: " user_name
+
+# drawline
+
+# read -p "Enter your $remote_git account email: " user_email
+
+# drawline
+
+# echo "Please check your answers:"
+# printf "The directory of this project: $PROMPT_HIGHLIGHT%s$RST\n" "$user_repo"
+# printf "Your code editor:  $PROMPT_HIGHLIGHT%s$RST\n" "$code_editor" 
+# printf "Your remote repository: $PROMPT_HIGHLIGHT%s$RST\n" "$remote_url" 
+# printf "Your remote repository name: $PROMPT_HIGHLIGHT%s$RST\n" "$user_name"  
+# printf "Your remote repository email: $PROMPT_HIGHLIGHT%s$RST\n" "$user_email"  
+
+# # echo Your username is $username, we will not display your password
+# while true; do
+#     read -p "Are these informations corrects? " yn
+#     case $yn in
+#         [Yy]* ) break;;
+#         [Nn]* ) exit;;
+#         * ) echo "Please answer yes or no.";;
+#     esac
+# done
+# drawline
+
+# ! for testing purpose
+
+# import a .env file with some infos:
+# user_repo=<user repo>
+# code_launch=<code editor>
+# remote_url=<remote url>
+# user_name=<name>
+# user_email=<email>
+
+set -a # automatically export all variables
+source .env
+set +a
+
+# ! for testing purpose [END]
+
+# ---------------------------------------------------------------------------
+# START
+# ---------------------------------------------------------------------------
+
+PrintGitLogo # print the git logo
+
+# ---------------------------------------------------------------------------
+
+
+
+PrintTitle "Setup and Installation"
+
+
+
+# ---------------------------------------------------------------------------
+
+
+PrintQ "Did the student successfully install Git on their local machine?"
+# ---------------------------------------------------------------------------
+
 if git --version ./?> /dev/null;
 then
-  echo GIT is installed
+  # echo GIT is installed
   git --version
 else
   echo GIT is not installed
   # install git
   sudo apt install git-all & pid=$!; wait $pid
+  git --version
 fi
 
-printf "$HIGHLIGHT%s$RST\n" "Configuration"
+# ---------------------------------------------------------------------------
+
+# create a Hello directory
+
+mkdir -p "$user_repo""hello" && cd "$_"  || return
+
+# Git configuration
+
+# Initialisation of the git repository
+
+git init > /dev/null && pid=$!; wait $pid
+
 # default branch name to avoid the warning message
-git config --global init.defaultBranch $primary_branch
+git config --local init.defaultBranch $primary_branch
 
-# store credential
-git config --global credential.helper store
+# ? store credential
+git config --local credential.helper store
 
-printf "$HIGHLIGHT%s$RST\n" "Create directory and change working directory"
-mkdir "$user_repo""hello" && cd $_  || return
-if pwd != "$user_repo""hello";
-then 
-  cd "$user_repo""hello/" || return
-fi
-
-# repository
-printf "$HIGHLIGHT%s$RST\n" "Initialisation of the git repository"
-git init && pid=$!; wait $pid
-
-# git remote add
-# git remote add origin $remote_url
 # configure --local
 git config --local user.name $user_name
 git config --local user.email $user_email
-# check git config
-git config --local --list
 
-printf "$BG_HIGHLIGHT%s$RST\n" "Git commits to commit"
-drawline
-# ------------------------------------------
-printf "$HIGHLIGHT%s$RST\n" "Create a file"
-drawline
-echo 'echo "Hello, World"' > hello.sh
-echo "git status:"
-git status
+# ---------------------------------------------------------------------------
+
+
+PrintQ "Did the student configure Git with a valid username and email address?"
+# ---------------------------------------------------------------------------
+
+git config user.name
+git config user.email
+
+
+# ---------------------------------------------------------------------------
+
+
+
+PrintTitle "Git commits to commit"
+
+
+
+# ---------------------------------------------------------------------------
+
+
+PrintQ "Did the student navigate to the work directory and create a subdirectory named hello?"
+# ---------------------------------------------------------------------------
+
+tree "$user_repo"
+
+
+PrintQ 'Did the student generate a file named hello.sh with the content echo "Hello, World" inside the hello directory?'
+# ---------------------------------------------------------------------------
+
+# Create a file
+echo 'echo "Hello, World"' > "$user_repo""hello/hello.sh"
 
 # first commit
-git add hello.sh
-git commit -m "init, added hello.sh"
-# generate and store First_Snapshot hastag
-first_snapshot=$(git log --pretty=format:"%H" -1)
+git add "$user_repo""hello/hello.sh" > /dev/null
+git commit -m "init, added hello.sh" > /dev/null
 
-# check working tree
-git status
+# ! generate and store First_Snapshot hastag <------------------------------------------------------------------<<<
+first_snapshot=$(git log --pretty=format:"%H" -1)
+printf "$RED%s$RST\n" "$(git log --pretty=format:"%H" -1)"
+
+# * proof
+
+tree "$user_repo"
+CatFile "$user_repo""hello/hello.sh"
+
+
+PrintQ "Did the student initialize a Git repository in the hello directory?"
+# ---------------------------------------------------------------------------
+
+GitStatus 1
+
+
+PrintQ "Did the student use the git status command to check the status of the repository?"
+# ---------------------------------------------------------------------------
+
+echo -e "Yes"
+
+
+PrintQ 'Did the student modify the hello.sh file content with the provided echo "Hello, $1"?'
+# ---------------------------------------------------------------------------
 
 # modify the file
-cat <<EOF>hello.sh
+cat <<EOF>"$user_repo""hello/hello.sh"
 #!/bin/bash
 
 echo "Hello, \$1"
 EOF
 
-git add hello.sh
-git commit -m "added shebang and argument" 2> /dev/null 
-# check working tree
-git status
 
-printf "$HIGHLIGHT%s$RST\n" "modify line 3"
+CatFile "$user_repo""hello/hello.sh"
+
+
+PrintQ 'Did the student stage the modified hello.sh file, commit the changes to the repository, and ensure that the working tree is clean afterward?'
+# ---------------------------------------------------------------------------
+
+# stage
+git add hello.sh > /dev/null
+# commit
+git commit -m "added shebang and argument" > /dev/null 
+
+# check
+GitStatus 2
+
+
+PrintQ 'Did the student further modify the hello.sh file to include comments, and then make two separate commits as instructed?'
+# ---------------------------------------------------------------------------
+
+#  modify line 3
 cat <<EOF>hello.sh
 #!/bin/bash
 
@@ -182,13 +367,18 @@ cat <<EOF>hello.sh
 echo "Hello, \$1"
 EOF
 
-git add hello.sh
-git commit -m "line 3, modified comment" 2> /dev/null 
+git add "$user_repo""hello/hello.sh" > /dev/null
+git commit -m "line 3, added comment" > /dev/null
 
-# Second_Recent_Snapshot hastag
+# show content
+CatFile "$user_repo""hello/hello.sh"
+
+
+# ! generate and store Second_Recent_Snapshot hastag <------------------------------------------------------------------<<<
 second_recent_snapshot=$(git log --pretty=format:"%H" -1)
+printf "$RED%s$RST\n" "$(git log --pretty=format:"%H" -1)"
 
-printf "$HIGHLIGHT%s$RST\n" "Modify line 4 and 5"
+# Modify line 4 and 5
 cat <<EOF>hello.sh
 #!/bin/bash
 
@@ -197,185 +387,524 @@ name=\${1:-"World"}
 echo "Hello, \$name"
 EOF
 
-git add hello.sh
-git commit -m "line 4 and 5, added variable"
+git add "$user_repo""hello/hello.sh" > /dev/null
+git commit -m "line 4 and 5, added variable" > /dev/null
 
-# History
-printf "$HIGHLIGHT%s$RST\n" "git history full"
+# show content
+CatFile "$user_repo""hello/hello.sh"
+
+
+PrintQ 'Did the student make two separate commits, with the first commit for the comment in line 1 and the second commit for the changes made to lines 3 and 4, as instructed?'
+# ---------------------------------------------------------------------------
+
+# check
+GitStatus 2
+
+
+# ---------------------------------------------------------------------------
+
+
+
+PrintTitle "History"
+
+
+
+# ---------------------------------------------------------------------------
+
+
+PrintQ 'Did the student display the Git history of the working directory with the git log command?'
+# ---------------------------------------------------------------------------
+
+# display the Git history
+PrintCmd 'git log'
 git log
-echo "----------"
-printf "$HIGHLIGHT%s$RST\n" "git history oneline format"
+
+
+PrintQ 'Did the student successfully display a condensed view of the Git history, showing only commit hashes and messages using the "One-Line History" format?'
+# ---------------------------------------------------------------------------
+
+PrintCmd 'git log --oneline'
 git log --oneline
-echo "----------"
-printf "$HIGHLIGHT%s$RST\n" "Personalized Format"
+
+
+
+PrintQ 'Was the student able to customize the log output to display the last 2 entries?'
+# ---------------------------------------------------------------------------
+
+PrintCmd 'git log --oneline -2'
+git log --oneline -2
+
+
+PrintQ 'Did the student successfully demonstrate viewing commits made within the last 5 minutes?'
+# ---------------------------------------------------------------------------
+
+PrintCmd 'git log --since="5 minutes ago" --until="now"'
+git log --since="5 minutes ago" --until="now"
+
+
+PrintQ 'Did the student successfully customize the format of Git logs and display them according to this example'
+printf "Example: $DIM%s$RST\n\n" " * e4e3645 2023-06-10 | Added a comment (HEAD -> main) [John Doe]?"
+# ---------------------------------------------------------------------------
+
+
+# customize the format
 git log --pretty=format:"%h %ad | %s%d [%an]" --date=short
-echo "----------"
 
-# Check it out
-printf "$HIGHLIGHT%s$RST\n" "Restore First Snapshot"
+
+# ---------------------------------------------------------------------------
+
+
+
+PrintTitle "Check it out"
+
+
+
+# ---------------------------------------------------------------------------
+
+
+PrintQ 'Did the student successfully restore the first snapshot of the working tree and print the content of hello.sh?'
+# ---------------------------------------------------------------------------
+
+# restore First Snapshot
+PrintCmd "git checkout $first_snapshot"
 git checkout $first_snapshot 2> /dev/null & pid=$!; wait $pid
-echo "Print the content of the hello.sh"
-echo "----------"
-cat hello.sh
-echo "----------"
 
-printf "$HIGHLIGHT%s$RST\n" "Restore Second Recent Snapshot"
-# note: detached HEAD state > return to main
-git checkout $primary_branch
+# show content
+CatFile "$user_repo""hello/hello.sh"
+
+
+PrintQ 'Did the student successfully restore the second recent snapshot and print the content of hello.sh?'
+# ---------------------------------------------------------------------------
+
+# restore First Snapshot
+PrintCmd "git checkout $second_recent_snapshot"
 git checkout $second_recent_snapshot 2> /dev/null & pid=$!; wait $pid
-echo "Print the content of the hello.sh"
-echo "----------"
-cat hello.sh
-echo "----------"
 
-printf "$HIGHLIGHT%s$RST\n" "Return to Latest Version"
-git checkout -
-cat hello.sh
+# show content
+CatFile "$user_repo""hello/hello.sh"
 
-printf "$BG_HIGHLIGHT%s$RST\n" "TAG me"
-drawline
-# ------------------------------------------
-printf "$HIGHLIGHT%s$RST\n" "Referencing Current Version"
+
+PrintQ 'Did the student ensure that the working directory reflects the latest version of hello.sh from the main branch without using commit hashes?'
+# ---------------------------------------------------------------------------
+
+PrintCmd "git checkout $primary_branch"
+git checkout $primary_branch 2> /dev/null & pid=$!; wait $pid
+
+# show content
+CatFile "$user_repo""hello/hello.sh"
+
+
+# ---------------------------------------------------------------------------
+
+
+
+PrintTitle "TAG me"
+
+
+
+# ---------------------------------------------------------------------------
+
+
+PrintQ 'Did the student successfully tag the current version of the repository as v1?'
+# ---------------------------------------------------------------------------
+
+PrintCmd "git tag v1"
 git tag v1
-printf "$HIGHLIGHT%s$RST\n" "Tagging Previous Version"
-git tag v1-beta HEAD^
-# HEAD^ refers to the parent of the current commit (i.e., the previous commit)
-# You can also use HEAD~1, which means "1 commit before HEAD"
-printf "$HIGHLIGHT%s$RST\n" "Navigating Tagged Versions"      
-# To move to the v1 tag:
-git checkout v1       
-# To move to the v1-beta tag:
-git checkout v1-beta
-# To return to the latest commit of your current branch (e.g., main):
-git checkout $primary_branch
-# Note: Replace 'main' with your branch name if different (e.g., 'master')
-# If you're unsure which branch you were on, you can use:
-git checkout -
-printf "$HIGHLIGHT%s$RST\n" "Listing Tags"
-git tag
+git log --oneline -1
 
-printf "$BG_HIGHLIGHT Changed your mind?$RST\n"
-drawline
-# ------------------------------------------
-printf "$HIGHLIGHT%s$RST\n" "Reverting Changes"
+
+PrintQ 'Did the student successfully tag the version immediately prior to the current version as v1-beta, without relying on commit hashes?'
+# ---------------------------------------------------------------------------
+
+PrintCmd "git tag v1-beta HEAD~1"
+git tag v1-beta HEAD~1
+git log --oneline -2
+
+
+PrintQ 'Did the student navigate back and forth between the two tagged versions, v1 and v1-beta?'
+# ---------------------------------------------------------------------------
+
+# Tnavigate back and forth between the two tagged versions
+# v1
+PrintCmd "git checkout v1"
+git checkout v1 2> /dev/null
+git log --oneline -2
+
+# v1-beta
+PrintCmd "git checkout v1-beta"
+git checkout v1-beta 2> /dev/null
+git log --oneline -2
+
+# To return to the latest commit of your current branch (e.g., main):
+echo -e "\nReturning to the latest commit of your current branch"
+PrintCmd "git checkout $primary_branch"
+git checkout $primary_branch 2> /dev/null
+git log --oneline -1
+
+
+PrintQ 'Did the student display a list of all tags present in the repository to verify successful tagging?'
+# ---------------------------------------------------------------------------
+
+echo -e "Yes"
+
+
+# ---------------------------------------------------------------------------
+
+
+
+PrintTitle "Changed your mind?"
+
+
+# ---------------------------------------------------------------------------
+
+
+PrintQ 'Did the student successfully revert the modifications made to the latest version of the file, restoring it to its original state before staging using a Git command?'
+# ---------------------------------------------------------------------------
 
 # modify of the file with unwanted comments
-sed -i "s/# Default is \"World\"/# This is a bad comment. We want to revert it./" hello.sh 
+sed -i "s/# Default is \"World\"/# This is a bad comment. We want to revert it./" "$user_repo""hello/hello.sh"
+
+# show content
+CatFile "$user_repo""hello/hello.sh"
 
 # revert all unstaged changes
-git checkout -- hello.sh
+PrintCmd "git restore hello.sh"
+git restore "$user_repo""hello/hello.sh"
+# restore for newest version of git otherwise `git checkout -- <filename>`
 
-printf "$HIGHLIGHT%s$RST\n" "Staging and Cleaning"
+# show content
+CatFile "$user_repo""hello/hello.sh"
 
-# modify of the file with unwanted comments
-sed -i "s/# This is a bad comment. We want to revert it./# This is an unwanted but staged comment/" hello.sh 
 
-git add hello.sh
-
-# Unstage the changes for a specific file:
-git reset HEAD hello.sh
-git checkout -- hello.sh
-
-printf "$HIGHLIGHT%s$RST\n" "Committing and Reverting"
+PrintQ 'Did the student introduce unwanted changes to the file, stage them, and then successfully clean the staging area to discard the changes?'
+# ---------------------------------------------------------------------------
 
 # modify of the file with unwanted comments
-sed -i "s/# This is an unwanted but staged comment/# This is an unwanted but committed change/" hello.sh 
-# 2. Stage the changes
-git add hello.sh
-# 3. Commit the changes
-git commit -m "Added unwanted changes"
-# 4. Revert the commit
+sed -i "s/# Default is \"World\"/# This is an unwanted but staged comment/" "$user_repo""hello/hello.sh"
+
+# show content
+CatFile "$user_repo""hello/hello.sh"
+
+# stage the file
+git add "$user_repo""hello/hello.sh"
+
+GitStatus
+
+# revert all staged changes
+PrintCmd "git reset HEAD hello.sh"
+git reset HEAD "$user_repo""hello/hello.sh"
+
+PrintCmd "git restore hello.sh"
+git restore "$user_repo""hello/hello.sh"
+
+# show content
+CatFile "$user_repo""hello/hello.sh"
+
+GitStatus
+
+
+PrintQ 'Did the student add unwanted changes again, stage the file, commit the changes, and then revert them back to their original state?'
+# ---------------------------------------------------------------------------
+
+# modify of the file with unwanted comments
+sed -i "s/# Default is \"World\"/# This is an unwanted but committed change/" "$user_repo""hello/hello.sh"
+
+# show content
+CatFile "$user_repo""hello/hello.sh"
+
+# stage the file
+PrintCmd 'git add hello.sh"'
+git add "$user_repo""hello/hello.sh"
+
+PrintCmd 'git commit -m "added an unwanted change, stage it and commit it"'
+# commit the changes
+git commit -m "added an unwanted change, stage it and commit it"
+
+# proof
+git log --oneline -1
+
+PrintCmd 'git revert HEAD'
 git revert --no-edit HEAD
 
-printf "$HIGHLIGHT%s$RST\n" "Tagging and Removing Commits"
-git tag oops
-printf "$HIGHLIGHT%s$RST\n" "Ensure that the HEAD points to v1"
-git reset --hard v1
-git checkout $primary_branch
+# show content
+CatFile "$user_repo""hello/hello.sh"
 
-printf "$HIGHLIGHT%s$RST\n" "Displaying Logs with Deleted Commits"
+# proof
+git log --oneline -1
+
+
+PrintQ 'Did the student tag the latest commit with oops and remove commits made after the v1 version, ensuring that the HEAD points to v1?'
+# ---------------------------------------------------------------------------
+
+# tagging the latest commit "oops"
+PrintCmd 'git tag oops'
+git tag oops
+
+# proof
+git log --oneline
+
+PrintCmd 'git reset --hard v1'
+git reset --hard v1
+
+# proof
+git log --oneline
+
+
+PrintQ 'Did the student display the logs with the deleted commits, particularly focusing on the commit tagged oops?'
+# ---------------------------------------------------------------------------
+
+PrintCmd 'git log --all --oneline  --grep="revert"'
 git log --all --oneline  --grep="revert"
 
-printf "$HIGHLIGHT%s$RST\n" "Cleaning Unreferenced Commits"
-# 1. reflog
+
+PrintQ "Did the student ensure that unreferenced commits were deleted from the history, with no logs remaining for these deleted commits?"
+# ---------------------------------------------------------------------------
+
+# delete tags and branches referencing the commits
+PrintCmd 'git tag -d "oops"'
+git tag -d "oops"
+
+# note, if pushed to remote `git push origin --delete oops`
+
+# expire reflog entries
+PrintCmd 'git reflog expire --expire-unreachable=now --all'
 git reflog expire --expire-unreachable=now --all
-# 2. Remove any unreachable objects
-# git gc --prune=now
-git gc --prune=now -q
 
-# If you want to be extra thorough:
-# git gc --aggressive --prune=now
+# run garbage collection
+PrintCmd 'git gc --prune=now --aggressive'
+git gc --prune=now --aggressive 2> /dev/null
 
-printf "$HIGHLIGHT%s$RST\n" "Author Information"
+# proof
+PrintCmd 'git log --oneline --all'
+git log --oneline --all
+
+
+PrintQ 'Did the student add author information to the file and commit the changes?'
+# ---------------------------------------------------------------------------
+
 # Add an author comment to the file and commit the changes.
-sed -i "s/# Default is \"World\"/# Default is World\\n# Author: Jim Weirich/" hello.sh 
+sed -i "s/# Default is \"World\"/# Default is World\\n# Author: Jim Weirich/" "$user_repo""hello/hello.sh"
 
-git add hello.sh
+# show content
+CatFile "$user_repo""hello/hello.sh"
+
+PrintCmd 'git add hello.sh'
+git add "$user_repo""hello/hello.sh"
+
+PrintCmd 'git commit -m "Add author comment"'
 git commit -m "Add author comment"
 
-printf "$HIGHLIGHT%s$RST\n" "Oops the author email was forgotten"
-sed -i "s/# Author: Jim Weirich/# Author: Jim Weirich\\n# Email: jim@weirich.net/" hello.sh 
+# proof
+git log --oneline -1
 
-git add hello.sh
-git commit --amend -m "added author email"
 
-printf "$BG_HIGHLIGHT%s$RST\n" "Move it"
-drawline
-# ------------------------------------------
-echo "Moving hello.sh"
+PrintQ 'Did the student update the file to include the author email without making a new commit, but included the change in the last commit?'
+# ---------------------------------------------------------------------------
+
+sed -i "s/# Author: Jim Weirich/# Author: Jim Weirich\\n# Email: jim@weirich.net/" "$user_repo""hello/hello.sh"
+
+# show content
+CatFile "$user_repo""hello/hello.sh"
+
+PrintCmd 'git add hello.sh'
+git add "$user_repo""hello/hello.sh"
+
+PrintCmd 'git commit --amend -m "Add author comment and email"'
+git commit --amend -m "Add author comment and author email"
+
+
+
+
+# proof
+git log --oneline -1
+
+
+# ---------------------------------------------------------------------------
+
+
+
+PrintTitle "Move it"
+
+
+# ---------------------------------------------------------------------------
+
+
+PrintQ 'Did the student successfully move the hello.sh program into a lib/ directory using Git commands?'
+# ---------------------------------------------------------------------------
 
 # move the program hello.sh into a lib/
+PrintCmd 'mkdir "lib"'
 mkdir "$user_repo""hello/lib"
-git mv hello.sh lib/
-git commit -m "Move hello.sh to lib/ directory"
 
-# create a Makefile in the root directory
-cat <<EOF>Makefile
+PrintCmd 'git mv "hello.sh" "lib/"'
+git mv "$user_repo""hello/hello.sh" "$user_repo""hello/lib/"
+
+tree "$user_repo""hello"
+
+
+PrintQ 'Did the student commit the move of hello.sh?'
+# ---------------------------------------------------------------------------
+
+git commit -m "moved hello.sh to lib/ using Git command"
+git log --oneline -1
+
+
+PrintQ 'Did the student create and commit a Makefile in the root directory of the repository with the provided content?'
+# ---------------------------------------------------------------------------
+
+# create the Makefile at the root of the repository
+cat <<EOF>"$user_repo""hello/Makefile"
 TARGET="lib/hello.sh"
 
 run:
 	bash \${TARGET}
 EOF
 
-git add Makefile
-git commit -m "Add Makefile"
+# show content
+CatFile "$user_repo""hello/Makefile"
 
-printf "$BG_HIGHLIGHT blobs, trees and commits$RST\n"
-drawline
-# ------------------------------------------
+PrintCmd 'git add Makefile'
+git add "$user_repo""hello/Makefile"
 
-echo "Exploring .git/ Directory"
+PrintCmd 'git commit -m "Added Makefile"'
+git commit -m "Added Makefile"
 
-cd .git || return
-ls
 
-# echo "objects: The bookshelves containing different versions of your project files (represented by blobs)."
-# echo "config: Library rules and settings, like opening hours and borrowing limits."
-# echo "refs: Catalog cards showing which sections (branches) are currently active and where specific versions (commits) are located."
-# echo "HEAD: The bookmark indicating which section (branch) you're currently browsing in the library."
-# read -rp "Press Enter to continue" </dev/tty
+# ---------------------------------------------------------------------------
 
-printf "$HIGHLIGHT%s$RST\n" "Latest Object Hash"
-git rev-parse HEAD
-object=$(git rev-parse HEAD)
-printf "$HIGHLIGHT%s$RST\n" "type of this object using Git commands"
-git cat-file -t "$object"
-printf "$HIGHLIGHT%s$RST\n" "content of this object using Git commands"
-git cat-file -p "$object"
 
-printf "$HIGHLIGHT%s$RST\n" "Dumping Directory Tree"
 
-git ls-tree HEAD
-git ls-tree HEAD:lib
+PrintTitle "blobs, trees and commits"
+
+
+
+# ---------------------------------------------------------------------------
+
+
+PrintQ 'Ask the student to navigate to the .git/ directory and explain to you the purpose of each subdirectory, including objects/, config, refs, and HEAD.'
+# ---------------------------------------------------------------------------
+
+PrintCmd 'tree -L 1 .git'
+tree -L 1 .git
+
+cat << EOF
+
+- branches        folder, contains information about remote branches (deprecated)
+- COMMIT_EDITMSG  file that contains the commit message of the most recent commit
+- config          configuration file for the repository, containing settings such as remote repositories, branch information, and user identity
+- description     file (plain-text) containing a description of the repository
+- HEAD            file that points to the current branch reference, typically refs/heads/main
+- hooks           folder, contains client- or server-side scripts that Git executes before or after certain operations, like committing or merging
+- index           file, staging area (or cache), where changes are stored before they are committed
+- info            folder, contains global exclude patterns for the repository (in the exclude file)
+- logs            folder, stores logs for the reflog, which keeps track of updates to the tips of branches and other references
+- objects         folder, stores all the content (blobs, trees, and commits) as binary files
+- ORIG_HEAD       file that records the original reference of HEAD before a potentially dangerous operation, such as a merge or a reset
+- packed-refs     file that stores a packed version of all references
+- refs            folder, contains references to commit objects. This includes heads (branches), tags, and remote-tracking branches
+
+[source](https://git-scm.com/docs/gitrepository-layout)
+EOF
+
+
+PrintQ 'Was the student able to explain the purpose of each subdirectory, including objects/, config, refs, and HEAD?'
+# ---------------------------------------------------------------------------
+
+echo -e "Most likely"
+
+
+PrintQ 'Did the student successfully find the latest object hash within the .git/objects/ directory using Git commands?'
+# ---------------------------------------------------------------------------
+
+PrintCmd 'git log -1 --format="%H"'
+LAST_OBJECT="$(git log -1 --format="%H")"
+echo -e "$LAST_OBJECT"
+# check with `find .git/objects -type f -printf '%T@ %p\n' | sort -n | tail -1`
+
+cat << EOF
+
+git log: shows the commit logs
+-1: limits the output to the latest commit
+--format="%H": specifies the format to show only the commit hash
+EOF
+
+
+PrintQ 'Was the student able to print the type and content of this object using Git commands?'
+# ---------------------------------------------------------------------------
+
+PrintCmd 'git cat-file -t "$(git log -1 --format="%H")"'
+git cat-file -t "$LAST_OBJECT"
+
+PrintCmd 'git cat-file -p "$(git log -1 --format="%H")"'
+git cat-file -p "$LAST_OBJECT"
+
+cat << EOF
+'-t' type
+'-p' content
+EOF
+
+
+PrintQ 'Did the student use Git commands to dump the directory tree referenced by a specific commit?'
+# ---------------------------------------------------------------------------
+
+# dump the directory tree referenced by this commit
+PrintCmd "git ls-tree --full-tree -r $LAST_OBJECT"
+git ls-tree --full-tree -r "$LAST_OBJECT"
+echo -e ""
+
+
+PrintQ "Were they able to dump the contents of the lib/ directory and the hello.sh file using Git commands?"
+# ---------------------------------------------------------------------------
+
+# dump the contents of the lib/ directory using Git commands
+PrintCmd "git ls-tree --full-tree -r HEAD lib"
+git ls-tree --full-tree -r "HEAD" lib
+echo -e ""
+
+# dump the contents of the hello.sh file using Git commands
+PrintCmd "git show HEAD:lib/hello.sh"
+git show HEAD:lib/hello.sh
+
+
+# ---------------------------------------------------------------------------
+
+
+
+PrintTitle "Branching, Merging & Rebasing"
+
+
+
+# ---------------------------------------------------------------------------
+
+
+PrintQ "Did the student successfully create and switch to a new branch named greet?"
+
+
+
+
+
+
+
+# ---------------------------------------------------------------------------
+
+
+
+exit 1
+
+
+
 
 cd "$user_repo""hello" || return
 
 # back to the work tree
 printf "$BG_HIGHLIGHT%s$RST\n" "Branching"
-drawline
+
+drawline # -----------------------------------------------------------------
+
 # ------------------------------------------
 
-printf "$HIGHLIGHT%s$RST\n" "Create and Switch to New Branch"
+# ---------------------------------------------------------------------------
+PrintQ "Create and Switch to New Branch"
 git checkout -b greet & pid=$!; wait $pid
 
 echo "Create a new file named greeter.sh"
@@ -425,18 +954,23 @@ echo "This is the Hello World example from the git project." > README.md
 git add README.md
 git commit -m "added README.md"
 
-printf "$HIGHLIGHT%s$RST\n" "Draw a commit tree diagram"
+# ---------------------------------------------------------------------------
+PrintQ "Draw a commit tree diagram"
 # git log --graph --oneline
 git log --graph --all --decorate --oneline
 
 printf "$BG_HIGHLIGHT Conflicts, merging and rebasing$RST\n"
-drawline
+
+drawline # -----------------------------------------------------------------
+
 # ------------------------------------------
 
 before_merge=$(git log --pretty=format:"%H" -1)
 
-printf "$HIGHLIGHT%s$RST\n" "Merge Main/Master into Greet Branch"
-printf "$HIGHLIGHT%s$RST\n" "Merge the changes from the Main/Master branch into the greet branch"
+# ---------------------------------------------------------------------------
+PrintQ "Merge Main/Master into Greet Branch"
+# ---------------------------------------------------------------------------
+PrintQ "Merge the changes from the Main/Master branch into the greet branch"
 
 git checkout greet
 git merge --no-edit $primary_branch
@@ -444,7 +978,8 @@ git merge --no-edit $primary_branch
 # switch to main/master branch
 git checkout $primary_branch
 
-printf "$HIGHLIGHT%s$RST\n" "______________________________________"
+# ---------------------------------------------------------------------------
+PrintQ "______________________________________"
 pwd
 tree
 
@@ -479,23 +1014,27 @@ fi
 # echo "which branch I'm in"
 # git rev-parse --abbrev-ref HEAD
 
-printf "$HIGHLIGHT%s$RST\n" "commit before merge"
+# ---------------------------------------------------------------------------
+PrintQ "commit before merge"
 echo "$before_merge"
 
 # pause to correct any conflicts
 read -rp $'\e[41mCorrect the conflicts in your code editor and press Enter to continue\e[0m' </dev/tty
 
-printf "$HIGHLIGHT%s$RST\n" "Rebasing Greet Branch"
+# ---------------------------------------------------------------------------
+PrintQ "Rebasing Greet Branch"
 git add hello.sh 
 git commit -m "added hello.sh"
 
-printf "$HIGHLIGHT%s$RST\n" "go back to the point before the initial merge between main/master and greet"
+# ---------------------------------------------------------------------------
+PrintQ "go back to the point before the initial merge between main/master and greet"
 git checkout $before_merge 2> /dev/null & pid=$!; wait $pid
 git rebase $primary_branch
 # HEAD is now detached, going back to main
 git checkout $primary_branch
 
-printf "$HIGHLIGHT%s$RST\n" "Merging Greet into Main/Master"
+# ---------------------------------------------------------------------------
+PrintQ "Merging Greet into Main/Master"
 # Merge the changes from the greet branch into the main/master branch.
 git merge --no-edit greet
 
@@ -513,7 +1052,9 @@ git merge --no-edit greet
 exit 0
 
 printf "$BG_HIGHLIGHT%s$RST\n" "Local and remote repositories"
-drawline
+
+drawline # -----------------------------------------------------------------
+
 # ------------------------------------------
 
 # In the work/ directory, make a clone of the repository hello as cloned_hello. (Do not use copy command)
@@ -567,10 +1108,13 @@ git push origin --all
 # read -rp "What is the single git command equivalent to what you did before to bring changes from remote to local main/master branch?" </dev/tty
 
 printf "$BG_HIGHLIGHT%s$RST\n" "Bare repositories"
-drawline
+
+drawline # -----------------------------------------------------------------
+
 # ------------------------------------------
 
-printf "$HIGHLIGHT%s$RST\n" "What is a bare repository and why is it needed?"
+# ---------------------------------------------------------------------------
+PrintQ "What is a bare repository and why is it needed?"
 
 cd "$user_repo" || return
 

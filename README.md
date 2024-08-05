@@ -311,10 +311,21 @@ git mv <file> <folder/>
 
 ### Exploring .git/ Directory
 
-- **objects**: The bookshelves containing different versions of your project files (represented by blobs).
-- **config**: Library rules and settings, like opening hours and borrowing limits.
-- **refs**: Catalog cards showing which sections (branches) are currently active and where specific versions (commits) are located.
-- **HEAD**: The bookmark indicating which section (branch) you're currently browsing in the library.
+file/folder | description
+-|-
+**branches**        | folder, contains information about remote branches (deprecated)
+**COMMIT_EDITMSG**  | file that contains the commit message of the most recent commit
+**config**          | configuration file for the repository, containing settings such as remote repositories, branch information, and user identity
+**description**     | file (plain-text) containing a description of the repository
+**HEAD**            | file that points to the current branch reference, typically refs/heads/main
+**hooks**           | folder, contains client or server side scripts that Git executes before or after certain operations, like committing or merging
+**index**           | file, staging area (or cache), where changes are stored before they are committed
+**info**            | folder, contains global exclude patterns for the repository (in the exclude file)
+**logs**            | folder, stores logs for the reflog, which keeps track of updates to the tips of branches and other references
+**objects**         | folder, stores all the content (blobs, trees, and commits) as binary files
+**ORIG_HEAD**       | file that records the original reference of HEAD before a potentially dangerous operation, such as a merge or a reset
+**packedrefs**      | file that stores a packed version of all references
+**refs**            | folder, contains references to commit objects. This includes heads (branches), tags, and remote-tracking branches
 
 ### Latest Object Hash
 
