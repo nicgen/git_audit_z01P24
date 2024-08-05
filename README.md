@@ -144,7 +144,7 @@ git commit -m "<commit_msg>"
 git status
 ```
 
-### History
+## History
 
 Show the history of the working directory.
 
@@ -182,7 +182,7 @@ including the commit hash, date, message, branch information, and author name, r
 git log --pretty=format:"%h %ad | %s%d [%an]" --date=short
 ```
 
-### Check it out
+## Check it out
 
 Restore First Snapshot
 
@@ -214,7 +214,7 @@ git checkout -
 cat hello.sh
 ```
 
-### TAG me
+## TAG me
 
 Referencing Current Version
 
@@ -245,7 +245,7 @@ Listing Tags
 git tag
 ```
 
-### Change your mind?
+## Change your mind?
 
 Reverting Changes
 
