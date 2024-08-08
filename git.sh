@@ -106,113 +106,113 @@ function GitStatus {
 
 # ! commented for testing purpose [START]
 
-# # check if path exists and create stock it in a variable
-# ensure_path() {
-#     local input_path="$1"
-#     local variable_name="$2"
+# check if path exists and create stock it in a variable
+ensure_path() {
+    local input_path="$1"
+    local variable_name="$2"
 
-#     # Add a trailing / if not already present
-#     if [[ "${input_path}" != */ ]]; then
-#         input_path="${input_path}/"
-#     fi
+    # Add a trailing / if not already present
+    if [[ "${input_path}" != */ ]]; then
+        input_path="${input_path}/"
+    fi
 
-#     # Check if the directory exists, create it if not
-#     if [[ ! -d "${input_path}" ]]; then
-#         mkdir -p "${input_path}"
-#     fi
+    # Check if the directory exists, create it if not
+    if [[ ! -d "${input_path}" ]]; then
+        mkdir -p "${input_path}"
+    fi
 
-#     # Assign the path to the specified variable
-#     eval "${variable_name}='${input_path}'"
-# }
+    # Assign the path to the specified variable
+    eval "${variable_name}='${input_path}'"
+}
 
-# # ---------------------------------------------------------------------------
-# # PROMPTS
-# # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# PROMPTS
+# ---------------------------------------------------------------------------
 
-# # project path
-# # todo if folder doesn't exists
-# echo "Choose the directory of your git project:"
-# while true ; do
-#     read -r -e -p "Path: " filepath
-#     if [[ "${filepath}" != */ ]]; then
-#         filepath="${filepath}/"
-#     fi
-#     if [ -d "$filepath" ] ; then
-#         break
-#     else
-#     fi
-#     echo "$filepath is not a directory..."
-# done
-# user_repo=${filepath}
-# echo Selected: "$user_repo"
+# project path
+# todo if folder doesn't exists
+echo "Choose the directory of your git project:"
+while true ; do
+    read -r -e -p "Path: " filepath
+    if [[ "${filepath}" != */ ]]; then
+        filepath="${filepath}/"
+    fi
+    if [ -d "$filepath" ] ; then
+        break
+    # else
+    fi
+    echo "$filepath is not a directory..."
+done
+user_repo=${filepath}
+echo Selected: "$user_repo"
 
-# drawline
+drawline
 
-# # choice editor
-# names=(Vscode Codium)
-# selected=()
-# PS3='Which code editor do you use? '
-# select name in "${names[@]}" ; do
-#     for reply in $REPLY ; do
-#         selected+=(${names[reply - 1]})
-#     done
-#     [[ $selected ]] && break
-# done
-# code_editor=${selected[@]}
-# if [ "$code_editor" == "Vscode" ]; then
-#   code_launch=code
-# else
-#   code_launch=codium
-# fi
+# choice editor
+names=(Vscode Codium)
+selected=()
+PS3='Which code editor do you use? '
+select name in "${names[@]}" ; do
+    for reply in $REPLY ; do
+        selected+=(${names[reply - 1]})
+    done
+    [[ $selected ]] && break
+done
+code_editor=${selected[@]}
+if [ "$code_editor" == "Vscode" ]; then
+  code_launch=code
+else
+  code_launch=codium
+fi
 
-# echo Selected: "$code_editor"
+echo Selected: "$code_editor"
 
-# drawline
+drawline
 
-# # choice repository
-# names=(Github Gitea)
-# selected=()
-# PS3='Which Git hosting service do you use? '
-# select name in "${names[@]}" ; do
-#     for reply in $REPLY ; do
-#         selected+=(${names[reply - 1]})
-#     done
-#     [[ $selected ]] && break
-# done
-# remote_git=${selected[@]}
-# # echo Selected: "$remote_git"
+# choice repository
+names=(Github Gitea)
+selected=()
+PS3='Which Git hosting service do you use? '
+select name in "${names[@]}" ; do
+    for reply in $REPLY ; do
+        selected+=(${names[reply - 1]})
+    done
+    [[ $selected ]] && break
+done
+remote_git=${selected[@]}
+# echo Selected: "$remote_git"
 
-# drawline
+drawline
 
-# read -p "Enter your $remote_git repository: " remote_url
+read -p "Enter your $remote_git repository: " remote_url
 
-# drawline
+drawline
 
-# read -p "Enter your $remote_git account name: " user_name
+read -p "Enter your $remote_git account name: " user_name
 
-# drawline
+drawline
 
-# read -p "Enter your $remote_git account email: " user_email
+read -p "Enter your $remote_git account email: " user_email
 
-# drawline
+drawline
 
-# echo "Please check your answers:"
-# printf "The directory of this project: $PROMPT_HIGHLIGHT%s$RST\n" "$user_repo"
-# printf "Your code editor:  $PROMPT_HIGHLIGHT%s$RST\n" "$code_editor" 
-# printf "Your remote repository: $PROMPT_HIGHLIGHT%s$RST\n" "$remote_url" 
-# printf "Your remote repository name: $PROMPT_HIGHLIGHT%s$RST\n" "$user_name"  
-# printf "Your remote repository email: $PROMPT_HIGHLIGHT%s$RST\n" "$user_email"  
+echo "Please check your answers:"
+printf "The directory of this project: $PROMPT_HIGHLIGHT%s$RST\n" "$user_repo"
+printf "Your code editor:  $PROMPT_HIGHLIGHT%s$RST\n" "$code_editor" 
+printf "Your remote repository: $PROMPT_HIGHLIGHT%s$RST\n" "$remote_url" 
+printf "Your remote repository name: $PROMPT_HIGHLIGHT%s$RST\n" "$user_name"  
+printf "Your remote repository email: $PROMPT_HIGHLIGHT%s$RST\n" "$user_email"  
 
-# # echo Your username is $username, we will not display your password
-# while true; do
-#     read -p "Are these informations corrects? " yn
-#     case $yn in
-#         [Yy]* ) break;;
-#         [Nn]* ) exit;;
-#         * ) echo "Please answer yes or no.";;
-#     esac
-# done
-# drawline
+# echo Your username is $username, we will not display your password
+while true; do
+    read -p "Are these informations corrects? " yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+drawline
 
 # ! commented for testing purpose [END]
 
@@ -226,9 +226,9 @@ function GitStatus {
 # user_name=<name>
 # user_email=<email>
 
-set -a # automatically export all variables
-source .env
-set +a
+# set -a # automatically export all variables
+# source .env
+# set +a
 
 # ! Import variables from the .env file [END]
 
