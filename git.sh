@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 
 # Notes
+
 # wait, waitpid, waitid - wait for process to change state
 # used for some process
 
 # I'm using  `cmd > /dev/null` as a trashbin. Anything written on /dev/null will disappear, it is often called the black hole of Linux.
-# Used for not showing some output, i our case it would overload the screen.
+# Used for not showing some output, in our case it would overload the screen.
 
 # ---------------------------------------------------------------------------
 # VARS
 # ---------------------------------------------------------------------------\
 
-# main or master?
+# main vs master?
 # https://www.zdnet.com/article/github-to-replace-master-with-main-starting-next-month/
 primary_branch=main
+
+full_script=0 # do you want to fully execute the script, even the remote part ?
 
 # colors
 HIGHLIGHT="\e[34m"
@@ -24,11 +27,14 @@ BLACK="\e[30m"
 RED="\e[31m"
 WHITE="\e[37m"
 BG_WHITE="\e[47m"
+BG_RED="\e[41m"
+YELLOW="\e[33m"
 
 # Style
 BOLD='\e[1m'
 UNDR='\e[4m'
 DIM="\E[2m"
+EXPND="\e[K"
 
 # Reset
 RST="\e[0m"
@@ -63,12 +69,12 @@ function PrintTitle {
 # print audit question
 function PrintQ {
   # printf "\n${BG_HIGHLIGHT}%s${RST}\n"
-  printf "\n\n$PROMPT_HIGHLIGHT%s$RST\n\n" "$1"
+  printf "\n\n$PROMPT_HIGHLIGHT%s$RST\n" "$1"
 }
 
 # for printing the files
 function PrintCmd {
-  printf "command: $DIM%s$RST\n\n" "$1"
+  printf "\n$DIM%s$YELLOW%s$RST\n\n" "command: " "$1"
 }
 
 # for printing the files
@@ -76,6 +82,11 @@ function CatFile {
   printf "\n$DIM---%s$RST\n" "$1"
   cat -n "$1"
   printf "$DIM---$RST\n"
+}
+
+function GitLog {
+  printf "\n$DIM%s$RST\n" "logs:"
+  git log --oneline -$1
 }
 
 # check status and log GitStatus [log num]
@@ -203,7 +214,10 @@ function GitStatus {
 # done
 # drawline
 
-# ! for testing purpose
+# ! commented for testing purpose [END]
+
+
+# ! Import variables from the .env file [START]
 
 # import a .env file with some infos:
 # user_repo=<user repo>
@@ -216,7 +230,7 @@ set -a # automatically export all variables
 source .env
 set +a
 
-# ! for testing purpose [END]
+# ! Import variables from the .env file [END]
 
 # ---------------------------------------------------------------------------
 # START
@@ -237,6 +251,8 @@ PrintTitle "Setup and Installation"
 
 PrintQ "Did the student successfully install Git on their local machine?"
 # ---------------------------------------------------------------------------
+
+PrintCmd "git --version"
 
 if git --version ./?> /dev/null;
 then
@@ -277,7 +293,10 @@ git config --local user.email $user_email
 PrintQ "Did the student configure Git with a valid username and email address?"
 # ---------------------------------------------------------------------------
 
+PrintCmd "git config user.name"
 git config user.name
+
+PrintCmd "git config user.email"
 git config user.email
 
 
@@ -295,6 +314,7 @@ PrintTitle "Git commits to commit"
 PrintQ "Did the student navigate to the work directory and create a subdirectory named hello?"
 # ---------------------------------------------------------------------------
 
+PrintCmd "tree $user_repo"
 tree "$user_repo"
 
 
@@ -432,7 +452,7 @@ PrintQ 'Was the student able to customize the log output to display the last 2 e
 # ---------------------------------------------------------------------------
 
 PrintCmd 'git log --oneline -2'
-git log --oneline -2
+GitLog 2
 
 
 PrintQ 'Did the student successfully demonstrate viewing commits made within the last 5 minutes?'
@@ -510,7 +530,7 @@ PrintQ 'Did the student successfully tag the current version of the repository a
 
 PrintCmd "git tag v1"
 git tag v1
-git log --oneline -1
+GitLog 1
 
 
 PrintQ 'Did the student successfully tag the version immediately prior to the current version as v1-beta, without relying on commit hashes?'
@@ -518,7 +538,7 @@ PrintQ 'Did the student successfully tag the version immediately prior to the cu
 
 PrintCmd "git tag v1-beta HEAD~1"
 git tag v1-beta HEAD~1
-git log --oneline -2
+GitLog 2
 
 
 PrintQ 'Did the student navigate back and forth between the two tagged versions, v1 and v1-beta?'
@@ -528,18 +548,18 @@ PrintQ 'Did the student navigate back and forth between the two tagged versions,
 # v1
 PrintCmd "git checkout v1"
 git checkout v1 2> /dev/null
-git log --oneline -2
+GitLog 2
 
 # v1-beta
 PrintCmd "git checkout v1-beta"
 git checkout v1-beta 2> /dev/null
-git log --oneline -2
+GitLog 2
 
 # To return to the latest commit of your current branch (e.g., main):
 echo -e "\nReturning to the latest commit of your current branch"
 PrintCmd "git checkout $primary_branch"
 git checkout $primary_branch 2> /dev/null
-git log --oneline -1
+GitLog 1
 
 
 PrintQ 'Did the student display a list of all tags present in the repository to verify successful tagging?'
@@ -621,7 +641,7 @@ PrintCmd 'git commit -m "added an unwanted change, stage it and commit it"'
 git commit -m "added an unwanted change, stage it and commit it"
 
 # proof
-git log --oneline -1
+GitLog 1
 
 PrintCmd 'git revert HEAD'
 git revert --no-edit HEAD
@@ -630,7 +650,7 @@ git revert --no-edit HEAD
 CatFile "$user_repo""hello/hello.sh"
 
 # proof
-git log --oneline -1
+GitLog 1
 
 
 PrintQ 'Did the student tag the latest commit with oops and remove commits made after the v1 version, ensuring that the HEAD points to v1?'
@@ -695,7 +715,7 @@ PrintCmd 'git commit -m "Add author comment"'
 git commit -m "Add author comment"
 
 # proof
-git log --oneline -1
+GitLog 1
 
 
 PrintQ 'Did the student update the file to include the author email without making a new commit, but included the change in the last commit?'
@@ -716,7 +736,7 @@ git commit --amend -m "Add author comment and author email"
 
 
 # proof
-git log --oneline -1
+GitLog 1
 
 
 # ---------------------------------------------------------------------------
@@ -746,7 +766,7 @@ PrintQ 'Did the student commit the move of hello.sh?'
 # ---------------------------------------------------------------------------
 
 git commit -m "moved hello.sh to lib/ using Git command"
-git log --oneline -1
+GitLog 1
 
 
 PrintQ 'Did the student create and commit a Makefile in the root directory of the repository with the provided content?'
@@ -871,45 +891,28 @@ git show HEAD:lib/hello.sh
 
 
 PrintTitle "Branching, Merging & Rebasing"
-
+# https://github.com/01-edu/public/tree/master/subjects/git#branching
 
 
 # ---------------------------------------------------------------------------
 
 
 PrintQ "Did the student successfully create and switch to a new branch named greet?"
-
-
-
-
-
-
-
 # ---------------------------------------------------------------------------
 
+# create and Switch to new branch name greet
+PrintCmd "git switch -c greet"
+git switch -c greet & pid=$!; wait $pid
+
+PrintCmd "git branch --show-current"
+git branch --show-current
 
 
-exit 1
-
-
-
-
-cd "$user_repo""hello" || return
-
-# back to the work tree
-printf "$BG_HIGHLIGHT%s$RST\n" "Branching"
-
-drawline # -----------------------------------------------------------------
-
-# ------------------------------------------
-
+PrintQ "Did the student create and commited a new file named greeter.sh in the lib directory with the provided code in it?"
 # ---------------------------------------------------------------------------
-PrintQ "Create and Switch to New Branch"
-git checkout -b greet & pid=$!; wait $pid
 
-echo "Create a new file named greeter.sh"
-pwd
-cat <<EOF>lib/greeter.sh
+# create a new file named greeter.sh inside /lib
+cat <<EOF>"$user_repo""hello/lib/greeter.sh"
 #!/bin/bash
 
 Greeter() {
@@ -918,12 +921,24 @@ Greeter() {
 }
 EOF
 
-git add lib/greeter.sh
+# show content
+CatFile "$user_repo""hello/lib/greeter.sh"
+
+PrintCmd 'git add lib/greeter.sh'
+git add "$user_repo""hello/lib/greeter.sh"
+
+PrintCmd 'git commit -m "added greeter.sh"'
 git commit -m "added greeter.sh"
 
-echo "Update the lib/hello.sh"
+GitLog 1
 
-cat <<EOF>lib/hello.sh
+
+PrintQ "Did the student update the lib/hello.sh file with the provided content, stage, and commit the changes?"
+# ---------------------------------------------------------------------------
+
+# update the lib/hello.sh
+
+cat <<EOF>"$user_repo""hello/lib/hello.sh"
 #!/bin/bash
 
 source lib/greeter.sh
@@ -936,55 +951,107 @@ fi
 Greeter "\$name"
 EOF
 
-git add lib/hello.sh
-git commit -m "updated hello.sh to use greeter.sh"
+# show content
+CatFile "$user_repo""hello/lib/hello.sh"
 
-sed -i "s/TARGET=\"lib\/hello.sh\"/# Ensure it runs the updated lib\/hello.sh file\\nTARGET=\"lib\/hello.sh\"/" Makefile
+PrintCmd 'git add lib/hello.sh'
+git add "$user_repo""hello/lib/hello.sh"
 
-git add Makefile
-git commit -m "added comment"
+PrintCmd 'git commit -m "updated hello.sh"'
+git commit -m "updated hello.sh"
 
-echo "Switch back to the $primary_branch branch, compare and show the differences between the $primary_branch and greet branches for Makefile, hello.sh, and greeter.sh files."
-git checkout $primary_branch
-git diff $primary_branch greet -- Makefile lib/hello.sh lib/greeter.sh
+GitLog 1
 
-echo "Generate a README.md"
 
-echo "This is the Hello World example from the git project." > README.md
-git add README.md
-git commit -m "added README.md"
-
+PrintQ "Did the student update the Makefile with the comment, stage, and commit the changes?"
 # ---------------------------------------------------------------------------
-PrintQ "Draw a commit tree diagram"
-# git log --graph --oneline
+
+sed -i "s/TARGET=\"lib\/hello.sh\"/# Ensure it runs the updated lib\/hello.sh file\\nTARGET=\"lib\/hello.sh\"/" "$user_repo""hello/Makefile"
+
+# show content
+CatFile "$user_repo""hello/Makefile"
+
+PrintCmd 'git add Makefile'
+git add "$user_repo""hello/Makefile"
+
+PrintCmd 'git commit -m "updated Makefile"'
+git commit -m "updated Makefile"
+
+GitLog 1
+
+
+PrintQ "Was the student able to compare and show the differences between the main and greet branches for the Makefile, hello.sh, and greeter.sh files?"
+# ---------------------------------------------------------------------------
+
+# ! Switch back to the main branch [link](https://github.com/01-edu/public/tree/master/subjects/git#branching)
+# > Switch back to the main branch, compare and show the differences between the main and greet branches for Makefile, hello.sh, and greeter.sh files.
+PrintCmd "git switch $primary_branch"
+git switch $primary_branch
+
+PrintCmd 'git diff greet..main -- "Makefile" "lib/hello.sh" "lib/greeter.sh"'
+git diff greet..main -- "$user_repo""hello/Makefile" "$user_repo""hello/lib/hello.sh" "$user_repo""hello/lib/greeter.sh"
+
+
+PrintQ "Did the student generate a README.md file with the provided content and commit it?"
+# ---------------------------------------------------------------------------
+
+echo "This is the Hello World example from the git project." > "$user_repo""hello/README.md"
+
+# show content
+CatFile "$user_repo""hello/README.md"
+
+PrintCmd 'git add README.md'
+git add "$user_repo""hello/README.md"
+
+PrintCmd 'git commit -m "added README"'
+git commit -m "added README"
+
+GitLog 1
+
+
+PrintQ "Did the student draw a commit tree diagram illustrating the diverging changes between all branches to demonstrate the branch history?"
+# ---------------------------------------------------------------------------
+
+PrintCmd "git log --graph --all --decorate --oneline"
 git log --graph --all --decorate --oneline
 
-printf "$BG_HIGHLIGHT Conflicts, merging and rebasing$RST\n"
-
-drawline # -----------------------------------------------------------------
-
-# ------------------------------------------
-
-before_merge=$(git log --pretty=format:"%H" -1)
 
 # ---------------------------------------------------------------------------
-PrintQ "Merge Main/Master into Greet Branch"
-# ---------------------------------------------------------------------------
-PrintQ "Merge the changes from the Main/Master branch into the greet branch"
 
-git checkout greet
+
+
+PrintTitle "Conflicts, merging and rebasing"
+
+
+
+# ---------------------------------------------------------------------------
+
+
+PrintQ "Did the student successfully merge the changes from the main branch into the greet branch?"
+# ---------------------------------------------------------------------------
+
+# switch to the greet branch
+PrintCmd "git switch greet"
+git switch greet
+
+# merge the <primary_branch> branch into the greet branch
+PrintCmd "git merge --no-edit $primary_branch"
 git merge --no-edit $primary_branch
 
-# switch to main/master branch
-git checkout $primary_branch
+PrintCmd "git log --graph --all --decorate --oneline"
+git log --graph --all --decorate --oneline
 
+
+PrintQ "Did the student make the specified changes to the hello.sh file in the main branch and commit them?"
 # ---------------------------------------------------------------------------
-PrintQ "______________________________________"
-pwd
-tree
+
+# ! switch to the <primary_branch> branch [link](https://github.com/01-edu/public/tree/master/subjects/git#conflicts-merging-and-rebasing)
+# > Switch to main branch and make the changes below to the hello.sh file, save and commit the changes.
+PrintCmd "git switch $primary_branch"
+git switch $primary_branch
 
 # make changes to hello.sh
-cat <<EOF>hello.sh
+cat <<EOF>"$user_repo""hello/lib/hello.sh"
 #!/bin/bash
 
 echo "What's your name"
@@ -993,79 +1060,189 @@ read my_name
 echo "Hello, \$my_name"
 EOF
 
-# save and commit the changes
-git add hello.sh
-git commit -m "unchanged previous changes"
+# show content
+CatFile "$user_repo""hello/lib/hello.sh"
 
-echo "Merging Main/Master into Greet Branch (Conflict)"
+PrintCmd 'git add lib/hello.sh'
+git add "$user_repo""hello/lib/hello.sh"
 
-git checkout greet
+PrintCmd 'git commit -m "modified lib/hello.sh"'
+git commit -m "modified lib/hello.sh"
+
+GitLog 1
+
+
+PrintQ "Did the student attempt to merge the main branch into the greet branch creating a conflict during the merge?"
+# ---------------------------------------------------------------------------
+
+# Attempt to merge the main branch into greet. Bingooo! There you have it, a conflict.
+
+# switch to the greet branch
+PrintCmd "git switch greet"
+git switch greet
+
+# ! generate and store Before_merge hash <------------------------------------------------------------------<<<
+# for debuging purose
+# echo -e "\n$BG_RED$EXPND""$(git branch)""$RST"
+# echo -e ""
+# echo -e "\n$BG_RED$EXPND""$(git log)""$RST"
+before_merge=$(git log --pretty=format:"%H" -1)
+# echo -e "\n$BG_RED%s$EXPND" "$before_merge"
+
+# merge the <primary_branch> branch into the greet branch
+PrintCmd "git merge --no-edit $primary_branch"
 git merge --no-edit $primary_branch
 
-# open vscode
-if which $code_launch;
-then
-  $code_launch .
-else
-  printf "$HIGHLIGHT%s$RST\n" "vscode is not installed"
-fi
+# ! BOOM Conflict!!! <------------------------------------------------------------------<<<
+echo -e "\n$BG_RED$EXPND""CONFLICT""$RST"
 
-# TEST whereami > greet
-# echo "which branch I'm in"
-# git rev-parse --abbrev-ref HEAD
+PrintCmd 'git checkout --theirs "lib/hello.sh"'
+git checkout --theirs "$user_repo""hello/lib/hello.sh"
 
+
+PrintQ "Did the student successfully resolve the conflict, accepting changes from the main branch?"
 # ---------------------------------------------------------------------------
-PrintQ "commit before merge"
-echo "$before_merge"
 
-# pause to correct any conflicts
-read -rp $'\e[41mCorrect the conflicts in your code editor and press Enter to continue\e[0m' </dev/tty
+echo -e "\nYes, by accepting the incoming changes from $primary_branch, as requested, with the cmd 'git checkout --theirs <filename>'"
 
+
+PrintQ "Did the student commit the conflict resolution changes?"
 # ---------------------------------------------------------------------------
-PrintQ "Rebasing Greet Branch"
-git add hello.sh 
-git commit -m "added hello.sh"
 
+PrintCmd 'git add lib/hello.sh'
+git add "$user_repo""hello/lib/hello.sh"
+
+PrintCmd 'git commit -m "resolving conflict by accepting incoming changes"'
+git commit -m "resolving conflict by accepting incoming changes from the $primary_branch branch"
+
+PrintCmd "git status"
+git status
+
+# check
+GitLog 2
+
+
+PrintQ "Did the student return to the point before the initial merge between main and greet?"
 # ---------------------------------------------------------------------------
-PrintQ "go back to the point before the initial merge between main/master and greet"
-git checkout $before_merge 2> /dev/null & pid=$!; wait $pid
+
+PrintCmd "git reset --hard $before_merge"
+git reset --hard $before_merge
+
+
+PrintQ "Did the student rebase the greet branch on top of the latest changes in the main branch?"
+# ---------------------------------------------------------------------------
+
+PrintCmd "git rebase $primary_branch"
 git rebase $primary_branch
-# HEAD is now detached, going back to main
-git checkout $primary_branch
+
+exit 1
+
+
+PrintQ "Did the student successfully merge the changes from the greet branch into the main branch?"
+# ---------------------------------------------------------------------------
+
+# ! BOOM Conflict!!! <------------------------------------------------------------------<<<
+echo -e "\n$BG_RED$EXPND""CONFLICT""$RST"
+
+PrintCmd 'git add lib/hello.sh lib/greeter.sh'
+git add "$user_repo""hello/lib/hello.sh" "$user_repo""hello/lib/greeter.sh"
+
+PrintCmd 'git commit --amend --no-edit'
+git commit --amend --no-edit
+
+PrintCmd "git status"
+git status
+
+PrintCmd "git rebase --continue"
+git rebase --continue
+
+cat <<EOF
+- Fast-forwarding is a specific type of merging that happens when the history allows for a simple extension without a new merge commit.
+
+- Merging is the general concept of integrating changes, potentially creating a new merge commit or requiring conflict resolution.
+- Rebasing is a powerful tool for manipulating history but should be used with caution, especially in collaborative workflows.
+EOF
+
+
+PrintQ "Ask the student to explain the difference between merging and rebasing and if he understand Fast-Forwarding."
+# ---------------------------------------------------------------------------
+
+echo -e "yes"
+
+
+PrintQ "Did the student demonstrate an understanding of fast-forwarding?"
+# ---------------------------------------------------------------------------
+
+echo -e "yes"
+
+
+PrintQ "was the student able to explain the difference between merging and rebasing?"
+# ---------------------------------------------------------------------------
+
+echo -e "yes"
+
 
 # ---------------------------------------------------------------------------
-PrintQ "Merging Greet into Main/Master"
-# Merge the changes from the greet branch into the main/master branch.
-git merge --no-edit greet
 
-# pause to correct any conflicts (no conflicts)
-# read -rp "Correct the conflicts and press Enter to continue" </dev/tty
 
-# printf "$HIGHLIGHT%s$RST\n" "Understanding Fast-Forwarding and Differences:"
-# printf "$HIGHLIGHT%s$RST\n" "Fast-forwarding is a specific type of merging that happens when the history allows for a simple extension without a new merge commit."
-# printf "$HIGHLIGHT%s$RST\n" "Merging is the general concept of integrating changes, potentially creating a new merge commit or requiring conflict resolution."
-# printf "$HIGHLIGHT%s$RST\n" "Rebasing is a powerful tool for manipulating history but should be used with caution, especially in collaborative workflows."
 
-# pause to explain fast-forwarding and the difference between merging and rebasing.
-# read -rp "Explain fast-forwarding and the difference between merging and rebasing" </dev/tty
+PrintTitle "Conflicts, merging and rebasing"
 
-exit 0
 
-printf "$BG_HIGHLIGHT%s$RST\n" "Local and remote repositories"
 
-drawline # -----------------------------------------------------------------
+# ---------------------------------------------------------------------------
 
-# ------------------------------------------
+
+PrintQ "Did the student complete the cloning process of the hello repository to cloned_hello?"
+# ---------------------------------------------------------------------------
 
 # In the work/ directory, make a clone of the repository hello as cloned_hello. (Do not use copy command)
 cd "$user_repo" || return
-git clone hello cloned_hello && cd cloned_hello || return
+
+PrintCmd git clone "hello" "cloned_hello"
+git clone "$user_repo""hello" "$user_repo""cloned_hello" && cd "$user_repo""cloned_hello" || return
+
+
+PrintQ "Did the student fetch and merge changes from the remote repository into the main branch?"
+
+
+
+
+exit 1
+
+
 # Show the logs for the cloned repository.
+PrintCmd "git log --all --oneline"
 git log --all --oneline
+
 # Display the name of the remote repository and provide more information about it.
+PrintCmd "git remote -v"
 git remote -v
+
 # List all remote and local branches in the cloned_hello repository.
+PrintCmd "git branch -a -v"
 git branch -a -v
+
+
+
+# exit 1
+
+# do you want to execute the full script, even the remote part
+if [ $full_script == 0 ]; then
+  echo -e 'you can now remove the tested "work" directory:'
+  echo -e "$BG_HIGHLIGHT""sudo rm -r $user_repo""$RST"
+  exit 1
+fi
+
+
+
+
+
+
+
+
+
+
 # -a flag shows all branches, including local and remote.
 # -v flag displays the branches in a verbose format, including the latest commit 
 

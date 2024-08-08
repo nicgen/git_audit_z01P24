@@ -364,17 +364,22 @@ git ls-tree HEAD:lib
 - Create a local branch named greet and switch to it.
 
 ```sh
-git checkout -b <new_branch> [<start point>]
+git switch -c <new_branch> [<start point>]
 ```
 
-> note: Specifying `-b` causes a new branch to be created as if git-branch were called and then checked out.
+> note: `-c` this option stands for "create" and tells Git to create a new branch if it doesn’t already exist
 
 ```sh
 # Switch back to the main branch
-git checkout master
+git switch master
+# note, `git checkout` is for the older version of git
 # compare and show the differences between the main and greet branches for Makefile, hello.sh, and greeter.sh files
-git diff master greet -- Makefile lib/hello.sh lib/greeter.sh
+git diff master..greet -- Makefile lib/hello.sh lib/greeter.sh
 ```
+
+`git diff main..greet` compares the main branch with the greet branch  
+`--` indicates the end of the options and the beginning of the file list  
+`Makefile hello.sh greeter.sh` specifies the files you want to compare  
 
 - Draw a commit tree diagram illustrating the diverging changes between all branches to demonstrate the branch history.
 
@@ -392,6 +397,14 @@ git log --graph --all --decorate --oneline
 ## Conflicts, merging and rebasing
 
 ### Merge Main into Greet Branch
+
+Automatic resolve
+
+```sh
+git merge -X theirs  $primary_branch
+# also 
+# git checkout --theirs <filename>
+```
 
 ```sh
 # 
