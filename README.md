@@ -9,10 +9,27 @@ Clone the repo and launch the script with
 
 ```sh
 clone https://github.com/nicgen/git_audit_z01P24.git
+cd git_audit_z01P24
 bash git.sh
 ```
 
-Fill the prompt and voilà
+Fill the prompt and voilà!
+
+Note: All the entries are prompted but there are also some options that you can de/activate:
+
+- primary_branch: main vs master ([reason](https://www.zdnet.com/article/github-to-replace-master-with-main-starting-next-month/))
+- markdown: do you want to export a markdown file?
+- full_script: do you want to fully execute the script, even the remote part?
+- for testing purpose you can inject a .env file:
+
+```txt file=.env
+user_repo=<user repo>
+code_launch=<code editor>
+remote_url=<remote url>
+user_name=<name>
+user_email=<email>
+```
+
 
 ## Links
 
