@@ -16,7 +16,14 @@
 # https://www.zdnet.com/article/github-to-replace-master-with-main-starting-next-month/
 primary_branch=main
 
-full_script=0 # do you want to fully execute the script, even the remote part ?
+# TESTING part
+# the markdown is experimental and doesn't fully work (some exports are not printing properly) 
+# USAGE: set markdown to `true` and execute `bash git.sh > audit_export.md`
+markdown=false  # do you want to export a markdown file?
+full_script=1 # do you want to fully execute the script, even the remote part?
+
+script_path="$(dirname -- "${BASH_SOURCE[0]}")"
+echo $script_path
 
 # colors
 HIGHLIGHT="\e[34m"
@@ -40,6 +47,8 @@ EXPND="\e[K"
 RST="\e[0m"
 
 PrintGitLogo(){
+  if [ $markdown == false ]
+    then
 echo -e "\n\n\n
 ${RED}⠀⠀⠀⠀⠀⢀⣤⡀⠀⠀⠀⠀⠀${BLACK}⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⠀⠀⠀⠀⠀⠀
 ${RED}⠀⠀⠀⠀⣀⠻⣿⣿⣦⡀⠀⠀⠀${BLACK}⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠿⠃⠀⣴⡆⠀⠀
@@ -49,6 +58,71 @@ ${RED}⠈⢻⣿⣿⣿⣿⡇⣿⣧⣴⣿⡿⠃${BLACK}⠀⠀⢘⣿⠿⠿⠟⠁⠀
 ${RED}⠀⠀⠙⢿⣿⣿⡀⣸⣿⣿⠋⠀⠀${BLACK}⠀⠀⣻⣿⣿⣿⣿⣶⠸⠿⠿⠿⠀⠻⠿⠟⠃
 ${RED}⠀⠀⠀⠀⠙⢿⣿⣿⠟⠁⠀⠀⠀${BLACK}⠀⠀⢿⣧⣤⣤⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ${RED}⠀⠀⠀⠀⠀⠀⠙⠁⠀⠀⠀⠀⠀${BLACK}⠀⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n$RST"
+else
+echo -e "\n\n\n
+\`\`\`txt
+⠀⠀⠀⠀⠀⢀⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⣀⠻⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠿⠃⠀⣴⡆⠀⠀
+⠀⠀⣠⣾⣿⣷⠉⢹⣿⣿⣆⠀⠀⠀⠀⢠⣴⣶⣶⣶⣶⠰⣶⣶⡆⣾⣿⣷⣶⡇
+⢠⣾⣿⣿⣿⣿⡇⣧⡙⠻⣿⣷⡄⠀⠀⣿⣿⠀⢈⣿⡇⠀⢸⣿⡇⢸⣿⡇⠀⠀
+⠈⢻⣿⣿⣿⣿⡇⣿⣧⣴⣿⡿⠃⠀⠀⢘⣿⠿⠿⠟⠁⠀⢸⣿⡇⢸⣿⣇⢀⡀
+⠀⠀⠙⢿⣿⣿⡀⣸⣿⣿⠋⠀⠀⠀⠀⣻⣿⣿⣿⣿⣶⠸⠿⠿⠿⠀⠻⠿⠟⠃
+⠀⠀⠀⠀⠙⢿⣿⣿⠟⠁⠀⠀⠀⠀⠀⢿⣧⣤⣤⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠁⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+\`\`\`\n"
+fi
+}
+
+PrintEnd(){
+  if [ markdown == false ]
+    then
+echo -e "\n
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠤⠲⠦⠉⠉⠉⠏⠉⠒⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢀⡠⠲⠃⢀⣤⠀⠀⠀⠲⠂⠀⠠⠆⠀⠙⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⢀⡔⠁⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⠊⠁⠀⢁⡴⠚⠉⣉⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⠠⠤⠔⠒⡄⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⡆⢰⠆⠀⠋⣠⠔⠉⠁⣀⡠⠄⠒⠂⠀⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠔⠊⠁⠀⠀⠀⠀⠀⣠⡴⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢠⡆⠀⠀⠀⡜⠁⣠⠔⠋⢁⡔⠒⠒⠤⡀⠀⠀⠀⠀⡐⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠎⠀⠀⠀⢀⣀⣤⣶⡾⠋⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⡆⡶⠀⠀⢀⡜⠁⢀⣀⢸⠀⠀⠀⠀⠈⢆⠀⠀⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠤⠊⠁⠀⢀⡀⣴⡿⠿⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠰⡀⠀⠀⠘⠀⡞⠁⠀⠉⢇⠀⣿⣄⠀⠈⡆⠀⠕⠒⠉⣉⡒⡄⠀⠀⠀⠀⢀⠤⠊⠁⢀⡠⠔⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠑⢄⡀⠀⠀⢇⠀⣤⡄⠈⢢⡈⠻⡖⢀⡞⣀⠔⠊⠁⠀⠀⠉⠐⠒⠠⢎⢁⡠⠔⠂⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⢂⠘⢿⣦⡇⠉⠓⢶⡫⠞⠁⣀⣤⣤⣤⣤⣤⣤⣤⠴⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢡⠦⠭⡇⠀⡠⠊⠀⣠⣮⣬⣿⣿⣿⣿⣿⣯⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⢀⠔⡧⠊⠀⢀⡜⠁⠙⣿⣿⣿⡿⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣀⣡⠎⠀⠀⢠⠊⠀⠀⠀⣸⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀⣰⣧⣀⣀⡠⣴⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢧⣤⣤⣾⡿⠿⠋⠁⠀⢹⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠁⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠿⠛⠛⠛⠛⠻⢿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⡰⢤⣀⣀⡄⢠⠞⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+"
+else
+echo -e "\n\n\n
+\`\`\`txt
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠤⠲⠦⠉⠉⠉⠏⠉⠒⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢀⡠⠲⠃⢀⣤⠀⠀⠀⠲⠂⠀⠠⠆⠀⠙⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⢀⡔⠁⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⠊⠁⠀⢁⡴⠚⠉⣉⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⠠⠤⠔⠒⡄⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⡆⢰⠆⠀⠋⣠⠔⠉⠁⣀⡠⠄⠒⠂⠀⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠔⠊⠁⠀⠀⠀⠀⠀⣠⡴⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢠⡆⠀⠀⠀⡜⠁⣠⠔⠋⢁⡔⠒⠒⠤⡀⠀⠀⠀⠀⡐⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠎⠀⠀⠀⢀⣀⣤⣶⡾⠋⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⡆⡶⠀⠀⢀⡜⠁⢀⣀⢸⠀⠀⠀⠀⠈⢆⠀⠀⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠤⠊⠁⠀⢀⡀⣴⡿⠿⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠰⡀⠀⠀⠘⠀⡞⠁⠀⠉⢇⠀⣿⣄⠀⠈⡆⠀⠕⠒⠉⣉⡒⡄⠀⠀⠀⠀⢀⠤⠊⠁⢀⡠⠔⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠑⢄⡀⠀⠀⢇⠀⣤⡄⠈⢢⡈⠻⡖⢀⡞⣀⠔⠊⠁⠀⠀⠉⠐⠒⠠⢎⢁⡠⠔⠂⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⢂⠘⢿⣦⡇⠉⠓⢶⡫⠞⠁⣀⣤⣤⣤⣤⣤⣤⣤⠴⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢡⠦⠭⡇⠀⡠⠊⠀⣠⣮⣬⣿⣿⣿⣿⣿⣯⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⢀⠔⡧⠊⠀⢀⡜⠁⠙⣿⣿⣿⡿⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣀⣡⠎⠀⠀⢠⠊⠀⠀⠀⣸⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀⣰⣧⣀⣀⡠⣴⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢧⣤⣤⣾⡿⠿⠋⠁⠀⢹⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠁⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠿⠛⠛⠛⠛⠻⢿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⡰⢤⣀⣀⡄⢠⠞⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+\`\`\`\n"
+fi
 }
 
 # ---------------------------------------------------------------------------
@@ -57,40 +131,103 @@ ${RED}⠀⠀⠀⠀⠀⠀⠙⠁⠀⠀⠀⠀⠀${BLACK}⠀⠀⠀⠈⠉⠉⠀⠀⠀
 
 # draw a line
 function drawline {
-  printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+if [ $markdown == false ]
+then
+printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+else
+printf "***"
+fi
 }
 
+# print title
 function PrintTitle {
-  # printf "\n${BG_HIGHLIGHT}%s${RST}\n"
-  printf "\n\n$PROMPT_HIGHLIGHT$BOLD$UNDR%s$RST\n" "$1"
-  drawline
+if [ $markdown == false ]
+then
+printf "\n\n$PROMPT_HIGHLIGHT$BOLD$UNDR%s$RST\n" "$1"
+drawline
+else
+printf "\n\n## %s\n" "$1"
+fi
 }
 
 # print audit question
 function PrintQ {
-  # printf "\n${BG_HIGHLIGHT}%s${RST}\n"
-  printf "\n\n$PROMPT_HIGHLIGHT%s$RST\n" "$1"
+if [ $markdown == false ]
+then
+printf "\n\n$PROMPT_HIGHLIGHT%s$RST\n" "$1"
+else
+printf "\n\n### %s\n" "$1"
+fi
 }
 
 # for printing the files
 function PrintCmd {
-  printf "\n$DIM%s$YELLOW%s$RST\n\n" "command: " "$1"
+if [ $markdown == false ]
+then
+printf "\n$DIM%s$YELLOW%s$RST\n\n" "command: " "$1"
+else
+printf "\n%s\`%s\`\n\n" "command: " "$1"
+fi
 }
 
 # for printing the files
 function CatFile {
-  printf "\n$DIM---%s$RST\n" "$1"
-  cat -n "$1"
-  printf "$DIM---$RST\n"
+if [ $markdown == false ]
+then
+printf "\n$DIM---%s$RST\n" "$1"
+cat -n "$1"
+printf "$DIM---$RST\n"
+else
+printf "\n\`\`\`sh %s\n" "$1"
+cat -n "$1"
+printf "\`\`\`\n"
+fi
 }
 
+# for printing the files
+function CatTxt {
+if [ $markdown == false ]
+then
+printf "\n$DIM---%s$RST\n"
+echo -e "$1"
+printf "$DIM---$RST\n"
+else
+printf "\n\`\`\`txt %s\n"
+echo -e "$1"
+printf "\`\`\`\n"
+fi
+}
+
+
 function GitLog {
+if [ $markdown == false ]
+  then
   printf "\n$DIM%s$RST\n" "logs:"
-  git log --oneline -$1
+  if [ $# -eq 0 ]
+  then
+  git log
+  else
+  git log -$1
+  fi
+else
+  if [ $# -eq 0 ]
+  then
+  printf "\n%s\n\`\`\`txt\n" "logs:"
+  git log
+  printf "\`\`\`\n"
+  else
+  printf "\n%s\n\`\`\`txt\n" "logs:"
+  git log -$1
+  printf "\`\`\`\n"
+  fi
+fi
+
 }
 
 # check status and log GitStatus [log num]
 function GitStatus {
+if [ $markdown == false ]
+  then
   if [ $# -eq 0 ]
   then
     printf "$DIM%s$RST\n" "Git status:"
@@ -98,10 +235,36 @@ function GitStatus {
   else
     printf "$DIM%s$RST\n" "Git status:"
     git status
-    echo ""
+    echo -e "\n"
     printf "$DIM%s$RST\n" "Git logs:"
     git log --oneline -"$1"
   fi
+else
+  if [ $# -eq 0 ]
+  then
+    printf "\`\`\`sh\n%s\n" "# git status"
+    git status
+    printf "\`\`\`\n"
+  else
+    printf "\`\`\`sh\n%s\n" "# git status"
+    git status
+    echo ""
+    printf "%s\n" "# git logs"
+    git log --oneline -"$1"
+    printf "\`\`\`\n"
+  fi
+
+fi
+}
+
+# for debuging purpose
+function DebugHere {
+printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' #
+echo -e "\n$BG_RED$EXPND" "DEBUG" "$RST"
+# echo -e "\n$BG_RED$EXPND""$(git log)""$RST"
+printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' #
+# before_merge=$(git log --pretty=format:"%H" -1)
+echo -e "\n$BG_RED%s$EXPND" "$before_merge"
 }
 
 # ! commented for testing purpose [START]
@@ -109,11 +272,11 @@ function GitStatus {
 # check if path exists and create stock it in a variable
 ensure_path() {
     local input_path="$1"
-    local variable_name="$2"
+    # local variable_name="$2"
 
-    # Add a trailing / if not already present
-    if [[ "${input_path}" != */ ]]; then
-        input_path="${input_path}/"
+    # Remove a trailing / if not already present
+    if [[ "${input_path}" == */ ]]; then
+        input_path="${input_path::-1}"
     fi
 
     # Check if the directory exists, create it if not
@@ -122,115 +285,122 @@ ensure_path() {
     fi
 
     # Assign the path to the specified variable
-    eval "${variable_name}='${input_path}'"
+    # eval "${variable_name}='${input_path}'"
+    echo -e "${input_path}"
 }
 
-# ---------------------------------------------------------------------------
-# PROMPTS
-# ---------------------------------------------------------------------------
 
-# project path
-# todo if folder doesn't exists
-echo "Choose the directory of your git project:"
-while true ; do
-    read -r -e -p "Path: " filepath
-    if [[ "${filepath}" != */ ]]; then
-        filepath="${filepath}/"
-    fi
-    if [ -d "$filepath" ] ; then
-        break
-    # else
-    fi
-    echo "$filepath is not a directory..."
-done
-user_repo=${filepath}
-echo Selected: "$user_repo"
+# # ---------------------------------------------------------------------------
+# # PROMPTS
+# # ---------------------------------------------------------------------------
 
-drawline
+# # project path
+# echo "Choose the directory of your git project:"
+# while true ; do
+#     read -r -e -p "Path: " filepath
+#     ensure_path "${filepath}"
+#     if [[ "${filepath}" != */ ]]; then
+#       break
+#     else
+#       filepath="${filepath::-1}"
+#       break
+#     fi
+# done
+# user_repo=${filepath}
 
-# choice editor
-names=(Vscode Codium)
-selected=()
-PS3='Which code editor do you use? '
-select name in "${names[@]}" ; do
-    for reply in $REPLY ; do
-        selected+=(${names[reply - 1]})
-    done
-    [[ $selected ]] && break
-done
-code_editor=${selected[@]}
-if [ "$code_editor" == "Vscode" ]; then
-  code_launch=code
-else
-  code_launch=codium
-fi
+# drawline
 
-echo Selected: "$code_editor"
+# # choice editor
+# names=(Vscode Codium)
+# selected=()
+# PS3='Which code editor do you use? '
+# select name in "${names[@]}" ; do
+#     for reply in $REPLY ; do
+#         selected+=(${names[reply - 1]})
+#     done
+#     [[ $selected ]] && break
+# done
+# code_editor=${selected[@]}
+# if [ "$code_editor" == "Vscode" ]; then
+#   code_launch=code
+# else
+#   code_launch=codium
+# fi
 
-drawline
+# echo Selected: "$code_editor"
 
-# choice repository
-names=(Github Gitea)
-selected=()
-PS3='Which Git hosting service do you use? '
-select name in "${names[@]}" ; do
-    for reply in $REPLY ; do
-        selected+=(${names[reply - 1]})
-    done
-    [[ $selected ]] && break
-done
-remote_git=${selected[@]}
-# echo Selected: "$remote_git"
+# drawline
 
-drawline
+# # choice repository
+# names=(Github Gitea)
+# selected=()
+# PS3='Which Git hosting service do you use? '
+# select name in "${names[@]}" ; do
+#     for reply in $REPLY ; do
+#         selected+=(${names[reply - 1]})
+#     done
+#     [[ $selected ]] && break
+# done
+# remote_git=${selected[@]}
+# # echo Selected: "$remote_git"
 
-read -p "Enter your $remote_git repository: " remote_url
+# drawline
 
-drawline
+# read -p "Enter your $remote_git repository: " remote_url
 
-read -p "Enter your $remote_git account name: " user_name
+# drawline
 
-drawline
+# read -p "Enter your $remote_git account name: " user_name
 
-read -p "Enter your $remote_git account email: " user_email
+# drawline
 
-drawline
+# read -p "Enter your $remote_git account email: " user_email
 
-echo "Please check your answers:"
-printf "The directory of this project: $PROMPT_HIGHLIGHT%s$RST\n" "$user_repo"
-printf "Your code editor:  $PROMPT_HIGHLIGHT%s$RST\n" "$code_editor" 
-printf "Your remote repository: $PROMPT_HIGHLIGHT%s$RST\n" "$remote_url" 
-printf "Your remote repository name: $PROMPT_HIGHLIGHT%s$RST\n" "$user_name"  
-printf "Your remote repository email: $PROMPT_HIGHLIGHT%s$RST\n" "$user_email"  
+# drawline
 
-# echo Your username is $username, we will not display your password
-while true; do
-    read -p "Are these informations corrects? " yn
-    case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-drawline
+# echo "Please check your answers:"
+# printf "The directory of this project: $PROMPT_HIGHLIGHT%s$RST\n" "$user_repo"
+# printf "Your code editor:  $PROMPT_HIGHLIGHT%s$RST\n" "$code_editor" 
+# printf "Your remote repository: $PROMPT_HIGHLIGHT%s$RST\n" "$remote_url" 
+# printf "Your remote repository name: $PROMPT_HIGHLIGHT%s$RST\n" "$user_name"  
+# printf "Your remote repository email: $PROMPT_HIGHLIGHT%s$RST\n" "$user_email"  
+
+# # echo Your username is $username, we will not display your password
+# while true; do
+#     read -p "Are these informations corrects? " yn
+#     case $yn in
+#         [Yy]* ) break;;
+#         [Nn]* ) exit;;
+#         * ) echo "Please answer yes or no.";;
+#     esac
+# done
+# drawline
 
 # ! commented for testing purpose [END]
 
 
-# ! Import variables from the .env file [START]
+# ! TESTING [START]
 
-# import a .env file with some infos:
+# ? Import variables from the .env file
+
+# ```txt file=.env
 # user_repo=<user repo>
 # code_launch=<code editor>
 # remote_url=<remote url>
 # user_name=<name>
 # user_email=<email>
+# ```
 
-# set -a # automatically export all variables
-# source .env
-# set +a
+set -a # automatically import all variables from your .env file
+if [ ! -f $script_path/.env ]; then
+echo "The .env file is not found!"
+exit 1
+else
+source .env
+fi
+set +a
 
-# ! Import variables from the .env file [END]
+# ! TESTING [END]
 
 # ---------------------------------------------------------------------------
 # START
@@ -269,7 +439,7 @@ fi
 
 # create a Hello directory
 
-mkdir -p "$user_repo""hello" && cd "$_"  || return
+mkdir -p "$user_repo/hello" && cd "$_"  || return
 
 # Git configuration
 
@@ -322,10 +492,10 @@ PrintQ 'Did the student generate a file named hello.sh with the content echo "He
 # ---------------------------------------------------------------------------
 
 # Create a file
-echo 'echo "Hello, World"' > "$user_repo""hello/hello.sh"
+echo 'echo "Hello, World"' > "$user_repo/hello/hello.sh"
 
 # first commit
-git add "$user_repo""hello/hello.sh" > /dev/null
+git add "$user_repo/hello/hello.sh" > /dev/null
 git commit -m "init, added hello.sh" > /dev/null
 
 # ! generate and store First_Snapshot hastag <------------------------------------------------------------------<<<
@@ -335,7 +505,7 @@ printf "$RED%s$RST\n" "$(git log --pretty=format:"%H" -1)"
 # * proof
 
 tree "$user_repo"
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 
 PrintQ "Did the student initialize a Git repository in the hello directory?"
@@ -354,14 +524,14 @@ PrintQ 'Did the student modify the hello.sh file content with the provided echo 
 # ---------------------------------------------------------------------------
 
 # modify the file
-cat <<EOF>"$user_repo""hello/hello.sh"
+cat <<EOF>"$user_repo/hello/hello.sh"
 #!/bin/bash
 
 echo "Hello, \$1"
 EOF
 
 
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 
 PrintQ 'Did the student stage the modified hello.sh file, commit the changes to the repository, and ensure that the working tree is clean afterward?'
@@ -387,11 +557,11 @@ cat <<EOF>hello.sh
 echo "Hello, \$1"
 EOF
 
-git add "$user_repo""hello/hello.sh" > /dev/null
+git add "$user_repo/hello/hello.sh" > /dev/null
 git commit -m "line 3, added comment" > /dev/null
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 
 # ! generate and store Second_Recent_Snapshot hastag <------------------------------------------------------------------<<<
@@ -407,11 +577,11 @@ name=\${1:-"World"}
 echo "Hello, \$name"
 EOF
 
-git add "$user_repo""hello/hello.sh" > /dev/null
+git add "$user_repo/hello/hello.sh" > /dev/null
 git commit -m "line 4 and 5, added variable" > /dev/null
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 
 PrintQ 'Did the student make two separate commits, with the first commit for the comment in line 1 and the second commit for the changes made to lines 3 and 4, as instructed?'
@@ -490,7 +660,7 @@ PrintCmd "git checkout $first_snapshot"
 git checkout $first_snapshot 2> /dev/null & pid=$!; wait $pid
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 
 PrintQ 'Did the student successfully restore the second recent snapshot and print the content of hello.sh?'
@@ -501,7 +671,7 @@ PrintCmd "git checkout $second_recent_snapshot"
 git checkout $second_recent_snapshot 2> /dev/null & pid=$!; wait $pid
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 
 PrintQ 'Did the student ensure that the working directory reflects the latest version of hello.sh from the main branch without using commit hashes?'
@@ -511,7 +681,7 @@ PrintCmd "git checkout $primary_branch"
 git checkout $primary_branch 2> /dev/null & pid=$!; wait $pid
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 
 # ---------------------------------------------------------------------------
@@ -582,43 +752,43 @@ PrintQ 'Did the student successfully revert the modifications made to the latest
 # ---------------------------------------------------------------------------
 
 # modify of the file with unwanted comments
-sed -i "s/# Default is \"World\"/# This is a bad comment. We want to revert it./" "$user_repo""hello/hello.sh"
+sed -i "s/# Default is \"World\"/# This is a bad comment. We want to revert it./" "$user_repo/hello/hello.sh"
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 # revert all unstaged changes
 PrintCmd "git restore hello.sh"
-git restore "$user_repo""hello/hello.sh"
+git restore "$user_repo/hello/hello.sh"
 # restore for newest version of git otherwise `git checkout -- <filename>`
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 
 PrintQ 'Did the student introduce unwanted changes to the file, stage them, and then successfully clean the staging area to discard the changes?'
 # ---------------------------------------------------------------------------
 
 # modify of the file with unwanted comments
-sed -i "s/# Default is \"World\"/# This is an unwanted but staged comment/" "$user_repo""hello/hello.sh"
+sed -i "s/# Default is \"World\"/# This is an unwanted but staged comment/" "$user_repo/hello/hello.sh"
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 # stage the file
-git add "$user_repo""hello/hello.sh"
+git add "$user_repo/hello/hello.sh"
 
 GitStatus
 
 # revert all staged changes
 PrintCmd "git reset HEAD hello.sh"
-git reset HEAD "$user_repo""hello/hello.sh"
+git reset HEAD "$user_repo/hello/hello.sh"
 
 PrintCmd "git restore hello.sh"
-git restore "$user_repo""hello/hello.sh"
+git restore "$user_repo/hello/hello.sh"
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 GitStatus
 
@@ -627,14 +797,14 @@ PrintQ 'Did the student add unwanted changes again, stage the file, commit the c
 # ---------------------------------------------------------------------------
 
 # modify of the file with unwanted comments
-sed -i "s/# Default is \"World\"/# This is an unwanted but committed change/" "$user_repo""hello/hello.sh"
+sed -i "s/# Default is \"World\"/# This is an unwanted but committed change/" "$user_repo/hello/hello.sh"
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 # stage the file
 PrintCmd 'git add hello.sh"'
-git add "$user_repo""hello/hello.sh"
+git add "$user_repo/hello/hello.sh"
 
 PrintCmd 'git commit -m "added an unwanted change, stage it and commit it"'
 # commit the changes
@@ -647,7 +817,7 @@ PrintCmd 'git revert HEAD'
 git revert --no-edit HEAD
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 # proof
 GitLog 1
@@ -703,13 +873,13 @@ PrintQ 'Did the student add author information to the file and commit the change
 # ---------------------------------------------------------------------------
 
 # Add an author comment to the file and commit the changes.
-sed -i "s/# Default is \"World\"/# Default is World\\n# Author: Jim Weirich/" "$user_repo""hello/hello.sh"
+sed -i "s/# Default is \"World\"/# Default is World\\n# Author: Jim Weirich/" "$user_repo/hello/hello.sh"
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 PrintCmd 'git add hello.sh'
-git add "$user_repo""hello/hello.sh"
+git add "$user_repo/hello/hello.sh"
 
 PrintCmd 'git commit -m "Add author comment"'
 git commit -m "Add author comment"
@@ -721,13 +891,13 @@ GitLog 1
 PrintQ 'Did the student update the file to include the author email without making a new commit, but included the change in the last commit?'
 # ---------------------------------------------------------------------------
 
-sed -i "s/# Author: Jim Weirich/# Author: Jim Weirich\\n# Email: jim@weirich.net/" "$user_repo""hello/hello.sh"
+sed -i "s/# Author: Jim Weirich/# Author: Jim Weirich\\n# Email: jim@weirich.net/" "$user_repo/hello/hello.sh"
 
 # show content
-CatFile "$user_repo""hello/hello.sh"
+CatFile "$user_repo/hello/hello.sh"
 
 PrintCmd 'git add hello.sh'
-git add "$user_repo""hello/hello.sh"
+git add "$user_repo/hello/hello.sh"
 
 PrintCmd 'git commit --amend -m "Add author comment and email"'
 git commit --amend -m "Add author comment and author email"
@@ -754,12 +924,12 @@ PrintQ 'Did the student successfully move the hello.sh program into a lib/ direc
 
 # move the program hello.sh into a lib/
 PrintCmd 'mkdir "lib"'
-mkdir "$user_repo""hello/lib"
+mkdir "$user_repo/hello/lib"
 
 PrintCmd 'git mv "hello.sh" "lib/"'
-git mv "$user_repo""hello/hello.sh" "$user_repo""hello/lib/"
+git mv "$user_repo/hello/hello.sh" "$user_repo/hello/lib/"
 
-tree "$user_repo""hello"
+tree "$user_repo/hello"
 
 
 PrintQ 'Did the student commit the move of hello.sh?'
@@ -773,7 +943,7 @@ PrintQ 'Did the student create and commit a Makefile in the root directory of th
 # ---------------------------------------------------------------------------
 
 # create the Makefile at the root of the repository
-cat <<EOF>"$user_repo""hello/Makefile"
+cat <<EOF>"$user_repo/hello/Makefile"
 TARGET="lib/hello.sh"
 
 run:
@@ -781,10 +951,10 @@ run:
 EOF
 
 # show content
-CatFile "$user_repo""hello/Makefile"
+CatFile "$user_repo/hello/Makefile"
 
 PrintCmd 'git add Makefile'
-git add "$user_repo""hello/Makefile"
+git add "$user_repo/hello/Makefile"
 
 PrintCmd 'git commit -m "Added Makefile"'
 git commit -m "Added Makefile"
@@ -807,8 +977,7 @@ PrintQ 'Ask the student to navigate to the .git/ directory and explain to you th
 PrintCmd 'tree -L 1 .git'
 tree -L 1 .git
 
-cat << EOF
-
+CatTxt "
 - branches        folder, contains information about remote branches (deprecated)
 - COMMIT_EDITMSG  file that contains the commit message of the most recent commit
 - config          configuration file for the repository, containing settings such as remote repositories, branch information, and user identity
@@ -824,7 +993,7 @@ cat << EOF
 - refs            folder, contains references to commit objects. This includes heads (branches), tags, and remote-tracking branches
 
 [source](https://git-scm.com/docs/gitrepository-layout)
-EOF
+"
 
 
 PrintQ 'Was the student able to explain the purpose of each subdirectory, including objects/, config, refs, and HEAD?'
@@ -841,12 +1010,11 @@ LAST_OBJECT="$(git log -1 --format="%H")"
 echo -e "$LAST_OBJECT"
 # check with `find .git/objects -type f -printf '%T@ %p\n' | sort -n | tail -1`
 
-cat << EOF
-
+CatTxt "
 git log: shows the commit logs
 -1: limits the output to the latest commit
 --format="%H": specifies the format to show only the commit hash
-EOF
+"
 
 
 PrintQ 'Was the student able to print the type and content of this object using Git commands?'
@@ -858,10 +1026,10 @@ git cat-file -t "$LAST_OBJECT"
 PrintCmd 'git cat-file -p "$(git log -1 --format="%H")"'
 git cat-file -p "$LAST_OBJECT"
 
-cat << EOF
+CatTxt "
 '-t' type
 '-p' content
-EOF
+"
 
 
 PrintQ 'Did the student use Git commands to dump the directory tree referenced by a specific commit?'
@@ -912,7 +1080,7 @@ PrintQ "Did the student create and commited a new file named greeter.sh in the l
 # ---------------------------------------------------------------------------
 
 # create a new file named greeter.sh inside /lib
-cat <<EOF>"$user_repo""hello/lib/greeter.sh"
+cat <<EOF>"$user_repo/hello/lib/greeter.sh"
 #!/bin/bash
 
 Greeter() {
@@ -922,10 +1090,10 @@ Greeter() {
 EOF
 
 # show content
-CatFile "$user_repo""hello/lib/greeter.sh"
+CatFile "$user_repo/hello/lib/greeter.sh"
 
 PrintCmd 'git add lib/greeter.sh'
-git add "$user_repo""hello/lib/greeter.sh"
+git add "$user_repo/hello/lib/greeter.sh"
 
 PrintCmd 'git commit -m "added greeter.sh"'
 git commit -m "added greeter.sh"
@@ -938,7 +1106,7 @@ PrintQ "Did the student update the lib/hello.sh file with the provided content, 
 
 # update the lib/hello.sh
 
-cat <<EOF>"$user_repo""hello/lib/hello.sh"
+cat <<EOF>"$user_repo/hello/lib/hello.sh"
 #!/bin/bash
 
 source lib/greeter.sh
@@ -952,10 +1120,10 @@ Greeter "\$name"
 EOF
 
 # show content
-CatFile "$user_repo""hello/lib/hello.sh"
+CatFile "$user_repo/hello/lib/hello.sh"
 
 PrintCmd 'git add lib/hello.sh'
-git add "$user_repo""hello/lib/hello.sh"
+git add "$user_repo/hello/lib/hello.sh"
 
 PrintCmd 'git commit -m "updated hello.sh"'
 git commit -m "updated hello.sh"
@@ -966,13 +1134,13 @@ GitLog 1
 PrintQ "Did the student update the Makefile with the comment, stage, and commit the changes?"
 # ---------------------------------------------------------------------------
 
-sed -i "s/TARGET=\"lib\/hello.sh\"/# Ensure it runs the updated lib\/hello.sh file\\nTARGET=\"lib\/hello.sh\"/" "$user_repo""hello/Makefile"
+sed -i "s/TARGET=\"lib\/hello.sh\"/# Ensure it runs the updated lib\/hello.sh file\\nTARGET=\"lib\/hello.sh\"/" "$user_repo/hello/Makefile"
 
 # show content
-CatFile "$user_repo""hello/Makefile"
+CatFile "$user_repo/hello/Makefile"
 
 PrintCmd 'git add Makefile'
-git add "$user_repo""hello/Makefile"
+git add "$user_repo/hello/Makefile"
 
 PrintCmd 'git commit -m "updated Makefile"'
 git commit -m "updated Makefile"
@@ -989,19 +1157,19 @@ PrintCmd "git switch $primary_branch"
 git switch $primary_branch
 
 PrintCmd 'git diff greet..main -- "Makefile" "lib/hello.sh" "lib/greeter.sh"'
-git diff greet..main -- "$user_repo""hello/Makefile" "$user_repo""hello/lib/hello.sh" "$user_repo""hello/lib/greeter.sh"
+git diff greet..main -- "$user_repo/hello/Makefile" "$user_repo/hello/lib/hello.sh" "$user_repo/hello/lib/greeter.sh"
 
 
 PrintQ "Did the student generate a README.md file with the provided content and commit it?"
 # ---------------------------------------------------------------------------
 
-echo "This is the Hello World example from the git project." > "$user_repo""hello/README.md"
+echo "This is the Hello World example from the git project." > "$user_repo/hello/README.md"
 
 # show content
-CatFile "$user_repo""hello/README.md"
+CatFile "$user_repo/hello/README.md"
 
 PrintCmd 'git add README.md'
-git add "$user_repo""hello/README.md"
+git add "$user_repo/hello/README.md"
 
 PrintCmd 'git commit -m "added README"'
 git commit -m "added README"
@@ -1030,6 +1198,10 @@ PrintTitle "Conflicts, merging and rebasing"
 PrintQ "Did the student successfully merge the changes from the main branch into the greet branch?"
 # ---------------------------------------------------------------------------
 
+# ! generate and store Before_merge hash <------------------------------------------------------------------<<<
+# ? generate and store Before_merge hash <------------------------------------------------------------------<<<
+before_merge=$(git log --pretty=format:"%H" -1)
+# ! generate and store Before_merge hash <------------------------------------------------------------------<<<
 # switch to the greet branch
 PrintCmd "git switch greet"
 git switch greet
@@ -1051,7 +1223,7 @@ PrintCmd "git switch $primary_branch"
 git switch $primary_branch
 
 # make changes to hello.sh
-cat <<EOF>"$user_repo""hello/lib/hello.sh"
+cat <<EOF>"$user_repo/hello/lib/hello.sh"
 #!/bin/bash
 
 echo "What's your name"
@@ -1061,16 +1233,15 @@ echo "Hello, \$my_name"
 EOF
 
 # show content
-CatFile "$user_repo""hello/lib/hello.sh"
+CatFile "$user_repo/hello/lib/hello.sh"
 
 PrintCmd 'git add lib/hello.sh'
-git add "$user_repo""hello/lib/hello.sh"
+git add "$user_repo/hello/lib/hello.sh"
 
 PrintCmd 'git commit -m "modified lib/hello.sh"'
 git commit -m "modified lib/hello.sh"
 
 GitLog 1
-
 
 PrintQ "Did the student attempt to merge the main branch into the greet branch creating a conflict during the merge?"
 # ---------------------------------------------------------------------------
@@ -1081,13 +1252,6 @@ PrintQ "Did the student attempt to merge the main branch into the greet branch c
 PrintCmd "git switch greet"
 git switch greet
 
-# ! generate and store Before_merge hash <------------------------------------------------------------------<<<
-# for debuging purose
-# echo -e "\n$BG_RED$EXPND""$(git branch)""$RST"
-# echo -e ""
-# echo -e "\n$BG_RED$EXPND""$(git log)""$RST"
-before_merge=$(git log --pretty=format:"%H" -1)
-# echo -e "\n$BG_RED%s$EXPND" "$before_merge"
 
 # merge the <primary_branch> branch into the greet branch
 PrintCmd "git merge --no-edit $primary_branch"
@@ -1095,13 +1259,13 @@ git merge --no-edit $primary_branch
 
 # ! BOOM Conflict!!! <------------------------------------------------------------------<<<
 echo -e "\n$BG_RED$EXPND""CONFLICT""$RST"
-
-PrintCmd 'git checkout --theirs "lib/hello.sh"'
-git checkout --theirs "$user_repo""hello/lib/hello.sh"
-
+# ! BOOM Conflict!!! <------------------------------------------------------------------<<<
 
 PrintQ "Did the student successfully resolve the conflict, accepting changes from the main branch?"
 # ---------------------------------------------------------------------------
+
+PrintCmd 'git checkout --theirs "lib/hello.sh"'
+git checkout --theirs "$user_repo/hello/lib/hello.sh"
 
 echo -e "\nYes, by accepting the incoming changes from $primary_branch, as requested, with the cmd 'git checkout --theirs <filename>'"
 
@@ -1110,7 +1274,7 @@ PrintQ "Did the student commit the conflict resolution changes?"
 # ---------------------------------------------------------------------------
 
 PrintCmd 'git add lib/hello.sh'
-git add "$user_repo""hello/lib/hello.sh"
+git add "$user_repo/hello/lib/hello.sh"
 
 PrintCmd 'git commit -m "resolving conflict by accepting incoming changes"'
 git commit -m "resolving conflict by accepting incoming changes from the $primary_branch branch"
@@ -1121,13 +1285,11 @@ git status
 # check
 GitLog 2
 
-
 PrintQ "Did the student return to the point before the initial merge between main and greet?"
 # ---------------------------------------------------------------------------
 
 PrintCmd "git reset --hard $before_merge"
 git reset --hard $before_merge
-
 
 PrintQ "Did the student rebase the greet branch on top of the latest changes in the main branch?"
 # ---------------------------------------------------------------------------
@@ -1135,33 +1297,28 @@ PrintQ "Did the student rebase the greet branch on top of the latest changes in 
 PrintCmd "git rebase $primary_branch"
 git rebase $primary_branch
 
-exit 1
-
-
 PrintQ "Did the student successfully merge the changes from the greet branch into the main branch?"
 # ---------------------------------------------------------------------------
 
-# ! BOOM Conflict!!! <------------------------------------------------------------------<<<
-echo -e "\n$BG_RED$EXPND""CONFLICT""$RST"
+# PrintCmd 'git add lib/hello.sh lib/greeter.sh'
+# git add "$user_repo/hello/lib/hello.sh" "$user_repo/hello/lib/greeter.sh"
 
-PrintCmd 'git add lib/hello.sh lib/greeter.sh'
-git add "$user_repo""hello/lib/hello.sh" "$user_repo""hello/lib/greeter.sh"
-
-PrintCmd 'git commit --amend --no-edit'
-git commit --amend --no-edit
+# PrintCmd 'git commit --amend --no-edit'
+# git commit --amend --no-edit
 
 PrintCmd "git status"
 git status
 
-PrintCmd "git rebase --continue"
-git rebase --continue
+# PrintCmd "git rebase --continue"
+# git rebase --continue
 
-cat <<EOF
+
+CatTxt "
 - Fast-forwarding is a specific type of merging that happens when the history allows for a simple extension without a new merge commit.
 
 - Merging is the general concept of integrating changes, potentially creating a new merge commit or requiring conflict resolution.
 - Rebasing is a powerful tool for manipulating history but should be used with caution, especially in collaborative workflows.
-EOF
+"
 
 
 PrintQ "Ask the student to explain the difference between merging and rebasing and if he understand Fast-Forwarding."
@@ -1199,117 +1356,281 @@ PrintQ "Did the student complete the cloning process of the hello repository to 
 # In the work/ directory, make a clone of the repository hello as cloned_hello. (Do not use copy command)
 cd "$user_repo" || return
 
-PrintCmd git clone "hello" "cloned_hello"
-git clone "$user_repo""hello" "$user_repo""cloned_hello" && cd "$user_repo""cloned_hello" || return
-
+PrintCmd git clone --mirror hello cloned_hello
+git clone --mirror "$user_repo/hello" "$user_repo/cloned_hello" && cd "$user_repo/cloned_hello" || return
 
 PrintQ "Did the student fetch and merge changes from the remote repository into the main branch?"
-
-
-
-
-exit 1
-
+# ---------------------------------------------------------------------------
 
 # Show the logs for the cloned repository.
 PrintCmd "git log --all --oneline"
 git log --all --oneline
 
-# Display the name of the remote repository and provide more information about it.
-PrintCmd "git remote -v"
-git remote -v
+
+PrintQ "Did the student list both remote and local branches, make changes to the original repository, and synchronize the cloned repository with remote changes?"
+# ---------------------------------------------------------------------------
 
 # List all remote and local branches in the cloned_hello repository.
 PrintCmd "git branch -a -v"
 git branch -a -v
 
+cd "$user_repo/hello" || return
+# Make changes to the original repository, update the README.md file with the provided content, and commit the changes.
+sed -i "s/This is the Hello World example from the git project./This is the Hello World example from the git project.\\n(changed in the original)/" "$user_repo/hello/README.md"
+
+# show README.md
+CatFile "$user_repo/hello/README.md"
+
+# add README.md
+PrintCmd "git add README.md"
+git add README.md
+
+# commit
+PrintCmd "git commit -m 'added comment'"
+git commit -m "added comment"
+
+cd "$user_repo/cloned_hello" || return
+
+# synchronize the cloned repository with remote changes
+
+PrintCmd "git fetch --all"
+git fetch --all
+
+PrintCmd "git merge origin/greet"
+git merge origin/greet
 
 
-# exit 1
+PrintQ "Did the student successfully clone the hello repository into the work/ directory as cloned_hello, without using the copy command?"
+# ---------------------------------------------------------------------------
+
+echo -e "Yes, by using 'git clone "hello" "cloned_hello"'"
+
+
+PrintQ "Did the student show the logs for the cloned_hello repository?"
+# ---------------------------------------------------------------------------
+
+PrintCmd "git log --all --oneline"
+git log --all --oneline
+
+
+PrintQ "Did the student display the name of the remote repository (origin) and provide more information about it?"
+# ---------------------------------------------------------------------------
+
+# Display the name of the remote repository and provide more information about it.
+PrintCmd "git remote -v"
+git remote -v
+
+
+PrintQ "Did the student list all remote and local branches in the cloned_hello repository?"
+# ---------------------------------------------------------------------------
+
+PrintCmd "git branch -a -v"
+git branch -a -v
+
+
+PrintQ "Did the student make changes to the original repository, update the README.md file with the provided content, and commit the changes?"
+# ---------------------------------------------------------------------------
+
+echo -e "Yes"
+
+
+PrintQ "Inside the cloned repository (cloned_hello), did the student fetch the changes from the remote repository and display the logs, ensuring commits from the hello repository are included?"
+# ---------------------------------------------------------------------------
+
+echo -e "Yes, see above"
+
+
+PrintQ "Did the student merge the changes from the remote main branch into the local main branch?"
+# ---------------------------------------------------------------------------
+
+echo -e "Yes, see above"
+
+
+PrintQ "Did the student add a local branch named greet tracking the remote origin/greet branch?"
+# ---------------------------------------------------------------------------
+
+echo -e "Yes, see above"
+
+
+PrintQ "Did the student add a remote reference to their Git repository?"
+# ---------------------------------------------------------------------------
+
+PrintCmd 'git remote set-url origin "$remote_url"'
+git remote set-url origin $remote_url
+
+
+PrintQ "Did the student push the main and greet branches to the remote repository?"
+# ---------------------------------------------------------------------------
 
 # do you want to execute the full script, even the remote part
+
+if [ $markdown == false ]
+then
+# printf "\n$DIM%s$YELLOW%s$RST\n\n" "command: " "$1"
 if [ $full_script == 0 ]; then
-  echo -e 'you can now remove the tested "work" directory:'
-  echo -e "$BG_HIGHLIGHT""sudo rm -r $user_repo""$RST"
-  exit 1
+  echo -e "TEST MODE:\nnothing is sent to the remote repository ($remote_url)"
+  # echo -e "$BG_HIGHLIGHT""sudo rm -r $user_repo""$RST"
+  # exit 1
+else
+  # echo -e "PRODUCTION MODE"
+  DebugHere # debug here
+  PrintCmd "git push"
+  git push
+fi
+else
+code_editor git.md
+printf "\n%s\`%s\`\n\n" "command: " "$1"
 fi
 
 
+echo -e "Opening now the remote repository, please check the result."
+
+xdg-open https://zone01normandie.org/git/ngenty/git_test.git
+
+# PAUSE, resume the script after opening the repo in the browser
+read -p "Press any key to resume ..."
 
 
+PrintQ "What is the single git command equivalent to what you did before to bring changes from remote to local main branch?"
+# ---------------------------------------------------------------------------
 
+PrintCmd "git pull origin main/master"
 
+echo -e "
+git fetch origin
+git merge origin/main
+# alt.
+git reset --hard origin/main
+"
 
+PrintQ "Did the student provide an accurate response?"
+# ---------------------------------------------------------------------------
 
+echo -e "Yes"
 
-
-# -a flag shows all branches, including local and remote.
-# -v flag displays the branches in a verbose format, including the latest commit 
-
-cd "$user_repo""hello" || return
-# Make changes to the original repository, update the README.md file with the provided content, and commit the changes.
-sed -i "s/This is the Hello World example from the git project./This is the Hello World example from the git project.\\n(changed in the original)/" README.md
-
-# and commit the changes
-git add README.md
-git commit -m "added comment"
-
-# Inside the cloned repository (cloned_hello)
-cd "$user_repo""cloned_hello" || return
-
-# fetch the changes from the remote repository
-git fetch --all
-# and display the logs. Ensure that commits from the hello repository are included in the logs.
-git log --all --oneline
-# Merge the changes from the remote main branch into the local main branch.
-git merge origin/$primary_branch
-
-# Add a local branch named greet tracking the remote origin/greet branch.
-git checkout -b greet origin/greet
-
-# Add a remote to your Git repository...
-# git remote add origin $remote_url
-git remote set-url origin "$remote_url"
-
-# ...and push the main/master
-echo "push main/master to origin..."
-# git push -u origin $primary_branch & pid=$!; wait $pid
-# ...and greet branches to the remote.
-echo "push greet to origin..."
-# git push -u origin greet & pid=$!; wait $pid
-git push origin --all
-
-# Be ready for this question in the audit!
-
-# echo "solution: git pull origin main/master"
-# read -rp "What is the single git command equivalent to what you did before to bring changes from remote to local main/master branch?" </dev/tty
-
-printf "$BG_HIGHLIGHT%s$RST\n" "Bare repositories"
-
-drawline # -----------------------------------------------------------------
-
-# ------------------------------------------
 
 # ---------------------------------------------------------------------------
+
+
+
+PrintTitle "Bare Repositories"
+
+
+
+# ---------------------------------------------------------------------------
+
+
 PrintQ "What is a bare repository and why is it needed?"
+# ---------------------------------------------------------------------------
+
+echo -e "
+A bare repository in Git is essentially a repository stripped down to its core functionality - version control history.  
+Unlike a regular repository you use for local development, a bare repository doesn't contain a working directory with the actual files you edit.  
+It only holds the internal data structures that track changes and history, typically stored in a hidden folder named .git.
+"
+
+
+PrintQ "Did the student correctly explain what a bare repository is and why it is needed?"
+# ---------------------------------------------------------------------------
+
+echo -e "Yes, read above the answer"
+
+
+PrintQ "Did the student successfully create a bare repository named hello.git from the existing hello repository?"
+# ---------------------------------------------------------------------------
 
 cd "$user_repo" || return
-
 # Create a bare repository named hello.git from the existing hello repository.
-git clone --bare hello hello.git & pid=$!; wait $pid
-# change directory
-cd "$user_repo""hello" || return
-# Add the bare hello.git repository as a remote to the original repository hello.
-git remote add origin "$user_repo""hello.git"
-# Change the README.md file in the original repository with the provided content
-sed -i "s/This is the Hello World example from the git project./This is the Hello World example from the git project.\\n(Changed in the original and pushed to shared)/" README.md
-# Commit the changes...
-git add README.md
-git commit -m "added comment"
-# ...and push them to the shared repository
+PrintCmd "git clone --bare hello hello.git"
+git clone --bare hello hello.git
 
-# Switch to the cloned repository cloned_hello
-cd "$user_repo""cloned_hello" || return
-# and pull down the changes just pushed to the shared repository.
-# ! change
-git pull "$user_repo""hello.git"
+
+PrintQ "Did the student add the bare hello.git repository as a remote to the original repository hello?"
+# ---------------------------------------------------------------------------
+
+# change directory
+cd "$user_repo/hello" || return
+# Add the bare hello.git repository as a remote to the original repository hello.
+git remote add origin "$user_repo/hello.git"
+
+
+PrintQ "Did the student change the README.md file in the original repository, commit the change, and push it to the shared repository?"
+# ---------------------------------------------------------------------------
+
+# Change the README.md file in the original repository with the provided content
+sed -i "s/This is the Hello World example from the git project./This is the Hello World example from the git project.\\n(Changed in the original and pushed to shared)/" "$user_repo/hello/README.md"
+
+CatFile "$user_repo/hello/README.md"
+
+# Commit the changes...
+git add "$user_repo/hello/README.md"
+git commit -m "added comment"
+
+
+PrintQ "Did the student switch to the cloned repository cloned_hello and successfully pull down the changes just pushed to the shared repository?"
+# ---------------------------------------------------------------------------
+
+# change directory
+PrintCmd "cd $user_repo/cloned_hello"
+cd "$user_repo/cloned_hello" || return
+
+PrintCmd "git pull"
+git pull
+
+echo -e "Yes"
+
+PrintEnd
+
+# fuck the git audit, it was a nightmare
+
+# exit 1
+
+
+# # -a flag shows all branches, including local and remote.
+# # -v flag displays the branches in a verbose format, including the latest commit 
+
+# # Inside the cloned repository (cloned_hello)
+# cd "$user_repo/cloned_hello" || return
+
+# # fetch the changes from the remote repository
+# git fetch --all
+# # and display the logs. Ensure that commits from the hello repository are included in the logs.
+# git log --all --oneline
+# # Merge the changes from the remote main branch into the local main branch.
+# git merge origin/$primary_branch
+
+# # Add a local branch named greet tracking the remote origin/greet branch.
+# git checkout -b greet origin/greet
+
+# # Add a remote to your Git repository...
+# # git remote add origin $remote_url
+# git remote set-url origin "$remote_url"
+
+# # ...and push the main/master
+# echo "push main/master to origin..."
+# # git push -u origin $primary_branch & pid=$!; wait $pid
+# # ...and greet branches to the remote.
+# echo "push greet to origin..."
+# # git push -u origin greet & pid=$!; wait $pid
+# git push origin --all
+
+# # Be ready for this question in the audit!
+
+# # echo "solution: git pull origin main/master"
+# # read -rp "What is the single git command equivalent to what you did before to bring changes from remote to local main/master branch?" </dev/tty
+
+
+
+# PrintQ "What is a bare repository and why is it needed?"
+# # ---------------------------------------------------------------------------
+
+# cd "$user_repo" || return
+
+
+# # ...and push them to the shared repository
+
+# # Switch to the cloned repository cloned_hello
+# cd "$user_repo/cloned_hello" || return
+# # and pull down the changes just pushed to the shared repository.
+# # ! change
+# git pull "$user_repo/hello.git"
