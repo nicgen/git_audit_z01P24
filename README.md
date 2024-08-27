@@ -13,12 +13,20 @@ cd git_audit_z01P24
 bash git.sh
 ```
 
-Fill the prompt and voilà!
+Fill the prompts and voilà!
 
-Note: All the entries are prompted but there are also some options that you can de/activate:
+Notes:
+- the prompt for the path will create the directories for you (create the work dir)
+- all the entries are prompted but there are also some options that you can de/activate:
+  - primary_branch: main vs master ([reason](https://www.zdnet.com/article/github-to-replace-master-with-main-starting-next-month/))
+  - markdown: do you want to export a markdown file?
 
-- primary_branch: main vs master ([reason](https://www.zdnet.com/article/github-to-replace-master-with-main-starting-next-month/))
-- markdown: do you want to export a markdown file?
+To export the markdown
+
+```sh
+bash git.sh > filename.md
+```
+
 - full_script: do you want to fully execute the script, even the remote part?
 - for testing purpose you can inject a .env file:
 
