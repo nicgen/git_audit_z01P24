@@ -74,7 +74,7 @@ fi
 }
 
 PrintEnd(){
-  if [ markdown == false ]
+  if [ $markdown == false ]
     then
 echo -e "\n
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠤⠲⠦⠉⠉⠉⠏⠉⠒⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -135,7 +135,7 @@ if [ $markdown == false ]
 then
 printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 else
-printf "***"
+printf "\n\n***\n\n"
 fi
 }
 
@@ -192,12 +192,11 @@ printf "\n$DIM---%s$RST\n"
 echo -e "$1"
 printf "$DIM---$RST\n"
 else
-printf "\n\`\`\`txt %s\n"
+printf "\n\`\`\`txt %v\n" "%s"
 echo -e "$1"
 printf "\`\`\`\n"
 fi
 }
-
 
 function GitLog {
 if [ $markdown == false ]
@@ -290,99 +289,107 @@ ensure_path() {
 }
 
 
-# # ---------------------------------------------------------------------------
-# # PROMPTS
-# # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# PROMPTS
+# ---------------------------------------------------------------------------
 
-# # project path
-# echo "Choose the directory of your git project:"
-# while true ; do
-#     read -r -e -p "Path: " filepath
-#     ensure_path "${filepath}"
-#     if [[ "${filepath}" != */ ]]; then
-#       break
-#     else
-#       filepath="${filepath::-1}"
-#       break
-#     fi
-# done
-# user_repo=${filepath}
+# project path
+echo "Choose the directory of your git project (the \"work\" directory).\nThe path will be created if it doesn\'t exists."
+while true ; do
+    # read -rep "Path: " filepath
+    read -r -e -p "Path: " filepath
+    userpath="${filepath/#~/${HOME}}"
+    unset filepath
+    ensure_path "${userpath}"
+    if [[ "${userpath}" != */ ]]; then
+      break
+    else
+      userpath="${userpath::-1}"
+      break
+    fi
+done
+user_repo=${userpath}
 
-# drawline
+drawline
 
-# # choice editor
+# ? no more used
 # names=(Vscode Codium)
 # selected=()
 # PS3='Which code editor do you use? '
 # select name in "${names[@]}" ; do
-#     for reply in $REPLY ; do
-#         selected+=(${names[reply - 1]})
-#     done
-#     [[ $selected ]] && break
+#     selected=("$name")
+#     break
 # done
-# code_editor=${selected[@]}
+# code_editor="${selected[*]}"
 # if [ "$code_editor" == "Vscode" ]; then
 #   code_launch=code
 # else
 #   code_launch=codium
 # fi
-
 # echo Selected: "$code_editor"
 
 # drawline
 
-# # choice repository
-# names=(Github Gitea)
-# selected=()
-# PS3='Which Git hosting service do you use? '
-# select name in "${names[@]}" ; do
-#     for reply in $REPLY ; do
-#         selected+=(${names[reply - 1]})
-#     done
-#     [[ $selected ]] && break
-# done
-# remote_git=${selected[@]}
-# # echo Selected: "$remote_git"
+# choice repository
+names=(Github Gitea)
+selected=()
+PS3='Which Git hosting service do you use? '
+select name in "${names[@]}" ; do
+    for reply in $REPLY ; do
+        selected+=("${names[reply - 1]}")
+    done
+    [[ $selected ]] && break
+done
+remote_git="${selected[@]}"
 
-# drawline
+names=(Github Gitea)
+selected=()
+PS3='Which Git hosting service do you use? '
+select name in "${names[@]}" ; do
+    selected=("$name")
+    break
+done
+remote_git="${selected[*]}"
+# echo Selected: "$remote_git"
 
-# read -p "Enter your $remote_git repository: " remote_url
+drawline
 
-# drawline
+read -p "Enter your $remote_git repository (url): " remote_url
 
-# read -p "Enter your $remote_git account name: " user_name
+drawline
 
-# drawline
+read -p "Enter your $remote_git account name (login): " user_name
 
-# read -p "Enter your $remote_git account email: " user_email
+drawline
 
-# drawline
+read -p "Enter your $remote_git account email: " user_email
 
-# echo "Please check your answers:"
-# printf "The directory of this project: $PROMPT_HIGHLIGHT%s$RST\n" "$user_repo"
+drawline
+
+echo "Please check your answers:"
+printf "The directory of this project: $PROMPT_HIGHLIGHT%s$RST\n" "$user_repo"
 # printf "Your code editor:  $PROMPT_HIGHLIGHT%s$RST\n" "$code_editor" 
-# printf "Your remote repository: $PROMPT_HIGHLIGHT%s$RST\n" "$remote_url" 
-# printf "Your remote repository name: $PROMPT_HIGHLIGHT%s$RST\n" "$user_name"  
-# printf "Your remote repository email: $PROMPT_HIGHLIGHT%s$RST\n" "$user_email"  
+printf "Your remote repository: $PROMPT_HIGHLIGHT%s$RST\n" "$remote_url" 
+printf "Your remote repository name: $PROMPT_HIGHLIGHT%s$RST\n" "$user_name"  
+printf "Your remote repository email: $PROMPT_HIGHLIGHT%s$RST\n" "$user_email"  
 
-# # echo Your username is $username, we will not display your password
-# while true; do
-#     read -p "Are these informations corrects? " yn
-#     case $yn in
-#         [Yy]* ) break;;
-#         [Nn]* ) exit;;
-#         * ) echo "Please answer yes or no.";;
-#     esac
-# done
-# drawline
+# echo Your username is $username, we will not display your password
+while true; do
+    read -p "Are these informations corrects (Yes/No)? " yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+drawline
 
 # ! commented for testing purpose [END]
 
 
 # ! TESTING [START]
 
-# ? Import variables from the .env file
-
+# ? Import variables from the .env file:
 # ```txt file=.env
 # user_repo=<user repo>
 # code_launch=<code editor>
@@ -391,14 +398,16 @@ ensure_path() {
 # user_email=<email>
 # ```
 
-set -a # automatically import all variables from your .env file
-if [ ! -f $script_path/.env ]; then
-echo "The .env file is not found!"
-exit 1
-else
-source .env
-fi
-set +a
+# ! uncomment for testing purpose
+# set -a # automatically import all variables from your .env file
+# if [ ! -f $script_path/.env ]; then
+# echo "The .env file is not found!"
+# exit 1
+# else
+# source .env
+# fi
+# set +a
+# !
 
 # ! TESTING [END]
 
@@ -1294,8 +1303,12 @@ git reset --hard $before_merge
 PrintQ "Did the student rebase the greet branch on top of the latest changes in the main branch?"
 # ---------------------------------------------------------------------------
 
-PrintCmd "git rebase $primary_branch"
-git rebase $primary_branch
+# note, already on greet
+PrintCmd "git rebase $primary_branch greet"
+git rebase $primary_branch greet
+
+PrintCmd "git checkout $primary_branch"
+git checkout $primary_branch
 
 PrintQ "Did the student successfully merge the changes from the greet branch into the main branch?"
 # ---------------------------------------------------------------------------
@@ -1343,7 +1356,7 @@ echo -e "yes"
 
 
 
-PrintTitle "Conflicts, merging and rebasing"
+PrintTitle "Local & Remote Repositories"
 
 
 
@@ -1356,25 +1369,15 @@ PrintQ "Did the student complete the cloning process of the hello repository to 
 # In the work/ directory, make a clone of the repository hello as cloned_hello. (Do not use copy command)
 cd "$user_repo" || return
 
-PrintCmd git clone --mirror hello cloned_hello
-git clone --mirror "$user_repo/hello" "$user_repo/cloned_hello" && cd "$user_repo/cloned_hello" || return
+PrintCmd git clone hello cloned_hello
+git clone "$user_repo/hello" "$user_repo/cloned_hello" && cd "$user_repo/cloned_hello" || return
+
 
 PrintQ "Did the student fetch and merge changes from the remote repository into the main branch?"
 # ---------------------------------------------------------------------------
 
-# Show the logs for the cloned repository.
-PrintCmd "git log --all --oneline"
-git log --all --oneline
-
-
-PrintQ "Did the student list both remote and local branches, make changes to the original repository, and synchronize the cloned repository with remote changes?"
-# ---------------------------------------------------------------------------
-
-# List all remote and local branches in the cloned_hello repository.
-PrintCmd "git branch -a -v"
-git branch -a -v
-
 cd "$user_repo/hello" || return
+
 # Make changes to the original repository, update the README.md file with the provided content, and commit the changes.
 sed -i "s/This is the Hello World example from the git project./This is the Hello World example from the git project.\\n(changed in the original)/" "$user_repo/hello/README.md"
 
@@ -1386,28 +1389,43 @@ PrintCmd "git add README.md"
 git add README.md
 
 # commit
-PrintCmd "git commit -m 'added comment'"
-git commit -m "added comment"
+PrintCmd "git commit -m 'modified comment'"
+git commit -m "modified comment"
 
+# change directory
 cd "$user_repo/cloned_hello" || return
 
-# synchronize the cloned repository with remote changes
+# fetch the changes from the remote
+PrintCmd "git fetch"
+git fetch
 
-PrintCmd "git fetch --all"
-git fetch --all
+# merge the changes
+PrintCmd "git merge origin/$primary_branch"
+git merge origin/$primary_branch
 
-PrintCmd "git merge origin/greet"
-git merge origin/greet
+# Show the logs for the cloned repository.
+PrintCmd "git log --all --oneline"
+git log --all --oneline
+
+PrintQ "Did the student list both remote and local branches, make changes to the original repository, and synchronize the cloned repository with remote changes?"
+# ---------------------------------------------------------------------------
+
+# List all remote and local branches in the cloned_hello repository.
+PrintCmd "git branch -a -v"
+git branch -a -v
 
 
 PrintQ "Did the student successfully clone the hello repository into the work/ directory as cloned_hello, without using the copy command?"
 # ---------------------------------------------------------------------------
 
-echo -e "Yes, by using 'git clone "hello" "cloned_hello"'"
+echo -e "Yes, by using \`git clone \"hello\" \"cloned_hello\"\`"
 
 
 PrintQ "Did the student show the logs for the cloned_hello repository?"
 # ---------------------------------------------------------------------------
+
+# change directory
+cd "$user_repo/cloned_hello" || return
 
 PrintCmd "git log --all --oneline"
 git log --all --oneline
@@ -1431,7 +1449,7 @@ git branch -a -v
 PrintQ "Did the student make changes to the original repository, update the README.md file with the provided content, and commit the changes?"
 # ---------------------------------------------------------------------------
 
-echo -e "Yes"
+echo -e "Yes, see above"
 
 
 PrintQ "Inside the cloned repository (cloned_hello), did the student fetch the changes from the remote repository and display the logs, ensuring commits from the hello repository are included?"
@@ -1449,13 +1467,17 @@ echo -e "Yes, see above"
 PrintQ "Did the student add a local branch named greet tracking the remote origin/greet branch?"
 # ---------------------------------------------------------------------------
 
-echo -e "Yes, see above"
+PrintCmd "git checkout -b greet"
+git checkout -b greet
+
+PrintCmd "git remote add -t greet hello ~/dev/git/work/hello"
+git remote add -t greet hello ~/dev/git/work/hello
 
 
 PrintQ "Did the student add a remote reference to their Git repository?"
 # ---------------------------------------------------------------------------
 
-PrintCmd 'git remote set-url origin "$remote_url"'
+PrintCmd "git remote set-url origin \"$remote_url\""
 git remote set-url origin $remote_url
 
 
@@ -1463,7 +1485,6 @@ PrintQ "Did the student push the main and greet branches to the remote repositor
 # ---------------------------------------------------------------------------
 
 # do you want to execute the full script, even the remote part
-
 if [ $markdown == false ]
 then
 # printf "\n$DIM%s$YELLOW%s$RST\n\n" "command: " "$1"
@@ -1474,8 +1495,8 @@ if [ $full_script == 0 ]; then
 else
   # echo -e "PRODUCTION MODE"
   DebugHere # debug here
-  PrintCmd "git push"
-  git push
+  PrintCmd "git push -u --all origin"
+  git push -u --all origin
 fi
 else
 code_editor git.md
@@ -1499,9 +1520,8 @@ PrintCmd "git pull origin main/master"
 echo -e "
 git fetch origin
 git merge origin/main
-# alt.
-git reset --hard origin/main
 "
+
 
 PrintQ "Did the student provide an accurate response?"
 # ---------------------------------------------------------------------------
@@ -1551,7 +1571,9 @@ PrintQ "Did the student add the bare hello.git repository as a remote to the ori
 # change directory
 cd "$user_repo/hello" || return
 # Add the bare hello.git repository as a remote to the original repository hello.
-git remote add origin "$user_repo/hello.git"
+
+PrintCmd "git remote add bare \"$user_repo/hello.git\""
+git remote add bare "$user_repo/hello.git"
 
 
 PrintQ "Did the student change the README.md file in the original repository, commit the change, and push it to the shared repository?"
@@ -1566,6 +1588,13 @@ CatFile "$user_repo/hello/README.md"
 git add "$user_repo/hello/README.md"
 git commit -m "added comment"
 
+CatFile "$user_repo/hello/README.md"
+
+PrintCmd "git push bare --mirror"
+git push bare --mirror
+
+GitLog 1
+
 
 PrintQ "Did the student switch to the cloned repository cloned_hello and successfully pull down the changes just pushed to the shared repository?"
 # ---------------------------------------------------------------------------
@@ -1574,8 +1603,8 @@ PrintQ "Did the student switch to the cloned repository cloned_hello and success
 PrintCmd "cd $user_repo/cloned_hello"
 cd "$user_repo/cloned_hello" || return
 
-PrintCmd "git pull"
-git pull
+PrintCmd "git pull hello HEAD"
+git pull hello HEAD
 
 echo -e "Yes"
 
@@ -1583,54 +1612,3 @@ PrintEnd
 
 # fuck the git audit, it was a nightmare
 
-# exit 1
-
-
-# # -a flag shows all branches, including local and remote.
-# # -v flag displays the branches in a verbose format, including the latest commit 
-
-# # Inside the cloned repository (cloned_hello)
-# cd "$user_repo/cloned_hello" || return
-
-# # fetch the changes from the remote repository
-# git fetch --all
-# # and display the logs. Ensure that commits from the hello repository are included in the logs.
-# git log --all --oneline
-# # Merge the changes from the remote main branch into the local main branch.
-# git merge origin/$primary_branch
-
-# # Add a local branch named greet tracking the remote origin/greet branch.
-# git checkout -b greet origin/greet
-
-# # Add a remote to your Git repository...
-# # git remote add origin $remote_url
-# git remote set-url origin "$remote_url"
-
-# # ...and push the main/master
-# echo "push main/master to origin..."
-# # git push -u origin $primary_branch & pid=$!; wait $pid
-# # ...and greet branches to the remote.
-# echo "push greet to origin..."
-# # git push -u origin greet & pid=$!; wait $pid
-# git push origin --all
-
-# # Be ready for this question in the audit!
-
-# # echo "solution: git pull origin main/master"
-# # read -rp "What is the single git command equivalent to what you did before to bring changes from remote to local main/master branch?" </dev/tty
-
-
-
-# PrintQ "What is a bare repository and why is it needed?"
-# # ---------------------------------------------------------------------------
-
-# cd "$user_repo" || return
-
-
-# # ...and push them to the shared repository
-
-# # Switch to the cloned repository cloned_hello
-# cd "$user_repo/cloned_hello" || return
-# # and pull down the changes just pushed to the shared repository.
-# # ! change
-# git pull "$user_repo/hello.git"
