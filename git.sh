@@ -17,10 +17,7 @@
 primary_branch=main
 
 # TESTING part
-# the markdown is experimental and doesn't fully work (some exports are not printing properly) 
-# USAGE: set markdown to `true` and execute `bash git.sh > audit_export.md`
-markdown=false  # do you want to export a markdown file?
-full_script=1 # do you want to fully execute the script, even the remote part?
+full_script=0 # do you want to fully execute the script, even the remote part?
 
 script_path="$(dirname -- "${BASH_SOURCE[0]}")"
 echo $script_path
@@ -47,8 +44,6 @@ EXPND="\e[K"
 RST="\e[0m"
 
 PrintGitLogo(){
-  if [ $markdown == false ]
-    then
 echo -e "\n\n\n
 ${RED}⠀⠀⠀⠀⠀⢀⣤⡀⠀⠀⠀⠀⠀${BLACK}⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⠀⠀⠀⠀⠀⠀
 ${RED}⠀⠀⠀⠀⣀⠻⣿⣿⣦⡀⠀⠀⠀${BLACK}⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠿⠃⠀⣴⡆⠀⠀
@@ -58,24 +53,9 @@ ${RED}⠈⢻⣿⣿⣿⣿⡇⣿⣧⣴⣿⡿⠃${BLACK}⠀⠀⢘⣿⠿⠿⠟⠁⠀
 ${RED}⠀⠀⠙⢿⣿⣿⡀⣸⣿⣿⠋⠀⠀${BLACK}⠀⠀⣻⣿⣿⣿⣿⣶⠸⠿⠿⠿⠀⠻⠿⠟⠃
 ${RED}⠀⠀⠀⠀⠙⢿⣿⣿⠟⠁⠀⠀⠀${BLACK}⠀⠀⢿⣧⣤⣤⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ${RED}⠀⠀⠀⠀⠀⠀⠙⠁⠀⠀⠀⠀⠀${BLACK}⠀⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n$RST"
-else
-echo -e "\n\n\n
-\`\`\`txt
-⠀⠀⠀⠀⠀⢀⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⣀⠻⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠿⠃⠀⣴⡆⠀⠀
-⠀⠀⣠⣾⣿⣷⠉⢹⣿⣿⣆⠀⠀⠀⠀⢠⣴⣶⣶⣶⣶⠰⣶⣶⡆⣾⣿⣷⣶⡇
-⢠⣾⣿⣿⣿⣿⡇⣧⡙⠻⣿⣷⡄⠀⠀⣿⣿⠀⢈⣿⡇⠀⢸⣿⡇⢸⣿⡇⠀⠀
-⠈⢻⣿⣿⣿⣿⡇⣿⣧⣴⣿⡿⠃⠀⠀⢘⣿⠿⠿⠟⠁⠀⢸⣿⡇⢸⣿⣇⢀⡀
-⠀⠀⠙⢿⣿⣿⡀⣸⣿⣿⠋⠀⠀⠀⠀⣻⣿⣿⣿⣿⣶⠸⠿⠿⠿⠀⠻⠿⠟⠃
-⠀⠀⠀⠀⠙⢿⣿⣿⠟⠁⠀⠀⠀⠀⠀⢿⣧⣤⣤⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠙⠁⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-\`\`\`\n"
-fi
 }
 
 PrintEnd(){
-  if [ $markdown == false ]
-    then
 echo -e "\n
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠤⠲⠦⠉⠉⠉⠏⠉⠒⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⢀⡠⠲⠃⢀⣤⠀⠀⠀⠲⠂⠀⠠⠆⠀⠙⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -98,31 +78,6 @@ echo -e "\n
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⡰⢤⣀⣀⡄⢠⠞⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 "
-else
-echo -e "\n\n\n
-\`\`\`txt
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠤⠲⠦⠉⠉⠉⠏⠉⠒⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⢀⡠⠲⠃⢀⣤⠀⠀⠀⠲⠂⠀⠠⠆⠀⠙⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⢀⡔⠁⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⢀⠊⠁⠀⢁⡴⠚⠉⣉⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⠠⠤⠔⠒⡄⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⡆⢰⠆⠀⠋⣠⠔⠉⠁⣀⡠⠄⠒⠂⠀⠀⠀⠀⠀⠀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠔⠊⠁⠀⠀⠀⠀⠀⣠⡴⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⢠⡆⠀⠀⠀⡜⠁⣠⠔⠋⢁⡔⠒⠒⠤⡀⠀⠀⠀⠀⡐⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠎⠀⠀⠀⢀⣀⣤⣶⡾⠋⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⡆⡶⠀⠀⢀⡜⠁⢀⣀⢸⠀⠀⠀⠀⠈⢆⠀⠀⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠤⠊⠁⠀⢀⡀⣴⡿⠿⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠰⡀⠀⠀⠘⠀⡞⠁⠀⠉⢇⠀⣿⣄⠀⠈⡆⠀⠕⠒⠉⣉⡒⡄⠀⠀⠀⠀⢀⠤⠊⠁⢀⡠⠔⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠑⢄⡀⠀⠀⢇⠀⣤⡄⠈⢢⡈⠻⡖⢀⡞⣀⠔⠊⠁⠀⠀⠉⠐⠒⠠⢎⢁⡠⠔⠂⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⢂⠘⢿⣦⡇⠉⠓⢶⡫⠞⠁⣀⣤⣤⣤⣤⣤⣤⣤⠴⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢡⠦⠭⡇⠀⡠⠊⠀⣠⣮⣬⣿⣿⣿⣿⣿⣯⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⢀⠔⡧⠊⠀⢀⡜⠁⠙⣿⣿⣿⡿⠟⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣀⣡⠎⠀⠀⢠⠊⠀⠀⠀⣸⣿⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀⣰⣧⣀⣀⡠⣴⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢧⣤⣤⣾⡿⠿⠋⠁⠀⢹⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠁⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠿⠛⠛⠛⠛⠻⢿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⡰⢤⣀⣀⡄⢠⠞⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-\`\`\`\n"
-fi
 }
 
 # ---------------------------------------------------------------------------
@@ -131,102 +86,47 @@ fi
 
 # draw a line
 function drawline {
-if [ $markdown == false ]
-then
 printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-else
-printf "\n\n***\n\n"
-fi
 }
 
 # print title
 function PrintTitle {
-if [ $markdown == false ]
-then
 printf "\n\n$PROMPT_HIGHLIGHT$BOLD$UNDR%s$RST\n" "$1"
 drawline
-else
-printf "\n\n## %s\n" "$1"
-fi
 }
 
 # print audit question
 function PrintQ {
-if [ $markdown == false ]
-then
 printf "\n\n$PROMPT_HIGHLIGHT%s$RST\n" "$1"
-else
-printf "\n\n### %s\n" "$1"
-fi
 }
 
 # for printing the files
 function PrintCmd {
-if [ $markdown == false ]
-then
 printf "\n$DIM%s$YELLOW%s$RST\n\n" "command: " "$1"
-else
-printf "\n%s\`%s\`\n\n" "command: " "$1"
-fi
 }
 
 # for printing the files
 function CatFile {
-if [ $markdown == false ]
-then
-printf "\n$DIM---%s$RST\n" "$1"
-cat -n "$1"
-printf "$DIM---$RST\n"
-else
-printf "\n\`\`\`sh %s\n" "$1"
-cat -n "$1"
-printf "\`\`\`\n"
-fi
+{ printf "\n$DIM---%s$RST\n" "$1"; cat -n "$1"; printf "$DIM---$RST\n"; }
 }
 
 # for printing the files
 function CatTxt {
-if [ $markdown == false ]
-then
-printf "\n$DIM---%s$RST\n"
-echo -e "$1"
-printf "$DIM---$RST\n"
-else
-printf "\n\`\`\`txt %v\n" "%s"
-echo -e "$1"
-printf "\`\`\`\n"
-fi
+{ printf "\n$DIM---%s$RST\n";echo -e "$1";printf "$DIM---$RST\n"; }
 }
 
 function GitLog {
-if [ $markdown == false ]
-  then
-  printf "\n$DIM%s$RST\n" "logs:"
-  if [ $# -eq 0 ]
-  then
-  git log
-  else
-  git log -$1
-  fi
+printf "\n$DIM%s$RST\n" "logs:"
+if [ $# -eq 0 ]
+then
+git log
 else
-  if [ $# -eq 0 ]
-  then
-  printf "\n%s\n\`\`\`txt\n" "logs:"
-  git log
-  printf "\`\`\`\n"
-  else
-  printf "\n%s\n\`\`\`txt\n" "logs:"
-  git log -$1
-  printf "\`\`\`\n"
-  fi
+git log -$1
 fi
-
 }
 
 # check status and log GitStatus [log num]
 function GitStatus {
-if [ $markdown == false ]
-  then
   if [ $# -eq 0 ]
   then
     printf "$DIM%s$RST\n" "Git status:"
@@ -238,22 +138,6 @@ if [ $markdown == false ]
     printf "$DIM%s$RST\n" "Git logs:"
     git log --oneline -"$1"
   fi
-else
-  if [ $# -eq 0 ]
-  then
-    printf "\`\`\`sh\n%s\n" "# git status"
-    git status
-    printf "\`\`\`\n"
-  else
-    printf "\`\`\`sh\n%s\n" "# git status"
-    git status
-    echo ""
-    printf "%s\n" "# git logs"
-    git log --oneline -"$1"
-    printf "\`\`\`\n"
-  fi
-
-fi
 }
 
 # for debuging purpose
@@ -288,106 +172,7 @@ ensure_path() {
     echo -e "${input_path}"
 }
 
-
-# ---------------------------------------------------------------------------
-# PROMPTS
-# ---------------------------------------------------------------------------
-
-# project path
-echo "Choose the directory of your git project (the \"work\" directory).\nThe path will be created if it doesn\'t exists."
-while true ; do
-    # read -rep "Path: " filepath
-    read -r -e -p "Path: " filepath
-    userpath="${filepath/#~/${HOME}}"
-    unset filepath
-    ensure_path "${userpath}"
-    if [[ "${userpath}" != */ ]]; then
-      break
-    else
-      userpath="${userpath::-1}"
-      break
-    fi
-done
-user_repo=${userpath}
-
-drawline
-
-# ? no more used
-# names=(Vscode Codium)
-# selected=()
-# PS3='Which code editor do you use? '
-# select name in "${names[@]}" ; do
-#     selected=("$name")
-#     break
-# done
-# code_editor="${selected[*]}"
-# if [ "$code_editor" == "Vscode" ]; then
-#   code_launch=code
-# else
-#   code_launch=codium
-# fi
-# echo Selected: "$code_editor"
-
-# drawline
-
-# choice repository
-names=(Github Gitea)
-selected=()
-PS3='Which Git hosting service do you use? '
-select name in "${names[@]}" ; do
-    for reply in $REPLY ; do
-        selected+=("${names[reply - 1]}")
-    done
-    [[ $selected ]] && break
-done
-remote_git="${selected[@]}"
-
-names=(Github Gitea)
-selected=()
-PS3='Which Git hosting service do you use? '
-select name in "${names[@]}" ; do
-    selected=("$name")
-    break
-done
-remote_git="${selected[*]}"
-# echo Selected: "$remote_git"
-
-drawline
-
-read -p "Enter your $remote_git repository (url): " remote_url
-
-drawline
-
-read -p "Enter your $remote_git account name (login): " user_name
-
-drawline
-
-read -p "Enter your $remote_git account email: " user_email
-
-drawline
-
-echo "Please check your answers:"
-printf "The directory of this project: $PROMPT_HIGHLIGHT%s$RST\n" "$user_repo"
-# printf "Your code editor:  $PROMPT_HIGHLIGHT%s$RST\n" "$code_editor" 
-printf "Your remote repository: $PROMPT_HIGHLIGHT%s$RST\n" "$remote_url" 
-printf "Your remote repository name: $PROMPT_HIGHLIGHT%s$RST\n" "$user_name"  
-printf "Your remote repository email: $PROMPT_HIGHLIGHT%s$RST\n" "$user_email"  
-
-# echo Your username is $username, we will not display your password
-while true; do
-    read -p "Are these informations corrects (Yes/No)? " yn
-    case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-drawline
-
-# ! commented for testing purpose [END]
-
-
-# ! TESTING [START]
+# ! ENV [START]
 
 # ? Import variables from the .env file:
 # ```txt file=.env
@@ -399,17 +184,17 @@ drawline
 # ```
 
 # ! uncomment for testing purpose
-# set -a # automatically import all variables from your .env file
-# if [ ! -f $script_path/.env ]; then
-# echo "The .env file is not found!"
-# exit 1
-# else
-# source .env
-# fi
-# set +a
+set -a # automatically import all variables from your .env file
+if [ ! -f $script_path/.env ]; then
+echo "The .env file is not found!"
+exit 1
+else
+source .env
+fi
+set +a
 # !
 
-# ! TESTING [END]
+# ! ENV [END]
 
 # ---------------------------------------------------------------------------
 # START
@@ -1485,8 +1270,6 @@ PrintQ "Did the student push the main and greet branches to the remote repositor
 # ---------------------------------------------------------------------------
 
 # do you want to execute the full script, even the remote part
-if [ $markdown == false ]
-then
 # printf "\n$DIM%s$YELLOW%s$RST\n\n" "command: " "$1"
 if [ $full_script == 0 ]; then
   echo -e "TEST MODE:\nnothing is sent to the remote repository ($remote_url)"
@@ -1498,11 +1281,6 @@ else
   PrintCmd "git push -u --all origin"
   git push -u --all origin
 fi
-else
-code_editor git.md
-printf "\n%s\`%s\`\n\n" "command: " "$1"
-fi
-
 
 echo -e "Opening now the remote repository, please check the result."
 
@@ -1610,5 +1388,5 @@ echo -e "Yes"
 
 PrintEnd
 
-# fuck the git audit, it was a nightmare
+# this git audit was a nightmare :P
 
