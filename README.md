@@ -10,31 +10,35 @@ Clone the repo and launch the script with
 ```sh
 clone https://github.com/nicgen/git_audit_z01P24.git
 cd git_audit_z01P24
+# rename .env_example to .env
+# fill the variables
 bash git.sh
 ```
 
-Fill the prompts and voilà!
-
 Notes:
-- the prompt for the path will create the directories for you (create the work dir)
 - all the entries are prompted but there are also some options that you can de/activate:
-  - primary_branch: main vs master ([reason](https://www.zdnet.com/article/github-to-replace-master-with-main-starting-next-month/))
-  - markdown: do you want to export a markdown file?
+  - `primary_branch=main`: main vs master ([reason](https://www.zdnet.com/article/github-to-replace-master-with-main-starting-next-month/))
+  - `full_script=1` (1 default) will execute the renote part `git push <remote_url>`
 
+<!-- ? unfinished
 To export the markdown
 
 ```sh
 bash git.sh > filename.md
-```
+``` -->
 
-- full_script: do you want to fully execute the script, even the remote part?
-- for testing purpose you can inject a .env file:
+### Env file
 
-```txt file=.env
+Before executing the script, you need to fulfill the .env file:
+
+```sh file=.env
+# your local directory, ex: /home/username/dev/git/work
 user_repo=<user repo>
-code_launch=<code editor>
+# your gitea repository (url)
 remote_url=<remote url>
+# your gitea account name
 user_name=<name>
+# your gitea account email
 user_email=<email>
 ```
 

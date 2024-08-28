@@ -17,7 +17,7 @@
 primary_branch=main
 
 # TESTING part
-full_script=0 # do you want to fully execute the script, even the remote part?
+full_script=1 # do you want to fully execute the script, even the remote part?
 
 script_path="$(dirname -- "${BASH_SOURCE[0]}")"
 echo $script_path
