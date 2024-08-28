@@ -245,7 +245,7 @@ git init > /dev/null && pid=$!; wait $pid
 git config --local init.defaultBranch $primary_branch
 
 # ? store credential
-git config --local credential.helper store
+# git config --local credential.helper store
 
 # configure --local
 git config --local user.name $user_name
@@ -1284,9 +1284,11 @@ fi
 
 echo -e "Opening now the remote repository, please check the result."
 
-xdg-open https://zone01normandie.org/git/ngenty/git_test.git
+# ! BUG?
+# xdg-open $remote_url
 
 # PAUSE, resume the script after opening the repo in the browser
+read -p "Open $remote_url"
 read -p "Press any key to resume ..."
 
 
@@ -1388,5 +1390,5 @@ echo -e "Yes"
 
 PrintEnd
 
-# this git audit was a nightmare :P
+# this git audit was a nightmare :))
 
