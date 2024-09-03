@@ -1245,8 +1245,8 @@ PrintQ "Did the student add a local branch named greet tracking the remote origi
 PrintCmd "git checkout -b greet"
 git checkout -b greet
 
-PrintCmd "git remote add -t greet hello ~/dev/git/work/hello"
-git remote add -t greet hello ~/dev/git/work/hello
+PrintCmd "git remote add -t greet hello $user_repo/hello"
+git remote add -t greet hello $user_repo/hello
 
 
 PrintQ "Did the student add a remote reference to their Git repository?"
