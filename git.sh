@@ -993,9 +993,7 @@ PrintQ "Did the student successfully merge the changes from the main branch into
 # ---------------------------------------------------------------------------
 
 # ! generate and store Before_merge hash <------------------------------------------------------------------<<<
-# ? generate and store Before_merge hash <------------------------------------------------------------------<<<
 before_merge=$(git log --pretty=format:"%H" -1)
-# ! generate and store Before_merge hash <------------------------------------------------------------------<<<
 # switch to the greet branch
 PrintCmd "git switch greet"
 git switch greet
@@ -1271,16 +1269,16 @@ PrintQ "Did the student push the main and greet branches to the remote repositor
 
 # do you want to execute the full script, even the remote part
 # printf "\n$DIM%s$YELLOW%s$RST\n\n" "command: " "$1"
-if [ $full_script == 0 ]; then
-  echo -e "TEST MODE:\nnothing is sent to the remote repository ($remote_url)"
-  # echo -e "$BG_HIGHLIGHT""sudo rm -r $user_repo""$RST"
-  # exit 1
-else
-  # echo -e "PRODUCTION MODE"
-  DebugHere # debug here
-  PrintCmd "git push -u --all origin"
-  git push -u --all origin
-fi
+# if [ $full_script == 0 ]; then
+#   echo -e "TEST MODE:\nnothing is sent to the remote repository ($remote_url)"
+#   # echo -e "$BG_HIGHLIGHT""sudo rm -r $user_repo""$RST"
+#   # exit 1
+# else
+#   # echo -e "PRODUCTION MODE"
+#   DebugHere # debug here
+#   PrintCmd "git push -u --all origin"
+#   git push -u --all origin
+# fi
 
 echo -e "Opening now the remote repository, please check the result."
 
@@ -1288,8 +1286,8 @@ echo -e "Opening now the remote repository, please check the result."
 # xdg-open $remote_url
 
 # PAUSE, resume the script after opening the repo in the browser
-read -p "Open $remote_url"
-read -p "Press any key to resume ..."
+# read -p "Open $remote_url"
+# read -p "Press any key to resume ..."
 
 
 PrintQ "What is the single git command equivalent to what you did before to bring changes from remote to local main branch?"
