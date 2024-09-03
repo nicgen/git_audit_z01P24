@@ -1269,16 +1269,16 @@ PrintQ "Did the student push the main and greet branches to the remote repositor
 
 # do you want to execute the full script, even the remote part
 # printf "\n$DIM%s$YELLOW%s$RST\n\n" "command: " "$1"
-# if [ $full_script == 0 ]; then
-#   echo -e "TEST MODE:\nnothing is sent to the remote repository ($remote_url)"
-#   # echo -e "$BG_HIGHLIGHT""sudo rm -r $user_repo""$RST"
-#   # exit 1
-# else
-#   # echo -e "PRODUCTION MODE"
-#   DebugHere # debug here
-#   PrintCmd "git push -u --all origin"
-#   git push -u --all origin
-# fi
+if [ $full_script == 0 ]; then
+  echo -e "TEST MODE:\nnothing is sent to the remote repository ($remote_url)"
+  # echo -e "$BG_HIGHLIGHT""sudo rm -r $user_repo""$RST"
+  # exit 1
+else
+  # echo -e "PRODUCTION MODE"
+  DebugHere # debug here
+  PrintCmd "git push -u --all origin"
+  git push -u --all origin
+fi
 
 echo -e "Opening now the remote repository, please check the result."
 
