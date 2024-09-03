@@ -44,19 +44,19 @@ EXPND="\e[K"
 RST="\e[0m"
 
 PrintGitLogo(){
-echo -e "\n\n\n
-${RED}⠀⠀⠀⠀⠀⢀⣤⡀⠀⠀⠀⠀⠀${BLACK}⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⠀⠀⠀⠀⠀⠀
-${RED}⠀⠀⠀⠀⣀⠻⣿⣿⣦⡀⠀⠀⠀${BLACK}⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠿⠃⠀⣴⡆⠀⠀
-${RED}⠀⠀⣠⣾⣿⣷⠉⢹⣿⣿⣆⠀⠀${BLACK}⠀⠀⢠⣴⣶⣶⣶⣶⠰⣶⣶⡆⣾⣿⣷⣶⡇
-${RED}⢠⣾⣿⣿⣿⣿⡇⣧⡙⠻⣿⣷⡄${BLACK}⠀⠀⣿⣿⠀⢈⣿⡇⠀⢸⣿⡇⢸⣿⡇⠀⠀
-${RED}⠈⢻⣿⣿⣿⣿⡇⣿⣧⣴⣿⡿⠃${BLACK}⠀⠀⢘⣿⠿⠿⠟⠁⠀⢸⣿⡇⢸⣿⣇⢀⡀
-${RED}⠀⠀⠙⢿⣿⣿⡀⣸⣿⣿⠋⠀⠀${BLACK}⠀⠀⣻⣿⣿⣿⣿⣶⠸⠿⠿⠿⠀⠻⠿⠟⠃
-${RED}⠀⠀⠀⠀⠙⢿⣿⣿⠟⠁⠀⠀⠀${BLACK}⠀⠀⢿⣧⣤⣤⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀
-${RED}⠀⠀⠀⠀⠀⠀⠙⠁⠀⠀⠀⠀⠀${BLACK}⠀⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n$RST"
+echo -e "\n\`\`\`sh
+⠀⠀⠀⠀⠀⢀⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⣀⠻⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠿⠃⠀⣴⡆⠀⠀
+⠀⠀⣠⣾⣿⣷⠉⢹⣿⣿⣆⠀⠀⠀⠀⢠⣴⣶⣶⣶⣶⠰⣶⣶⡆⣾⣿⣷⣶⡇
+⢠⣾⣿⣿⣿⣿⡇⣧⡙⠻⣿⣷⡄⠀⠀⣿⣿⠀⢈⣿⡇⠀⢸⣿⡇⢸⣿⡇⠀⠀
+⠈⢻⣿⣿⣿⣿⡇⣿⣧⣴⣿⡿⠃⠀⠀⢘⣿⠿⠿⠟⠁⠀⢸⣿⡇⢸⣿⣇⢀⡀
+⠀⠀⠙⢿⣿⣿⡀⣸⣿⣿⠋⠀⠀⠀⠀⣻⣿⣿⣿⣿⣶⠸⠿⠿⠿⠀⠻⠿⠟⠃
+⠀⠀⠀⠀⠙⢿⣿⣿⠟⠁⠀⠀⠀⠀⠀⢿⣧⣤⣤⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠁⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n\`\`\`\n"
 }
 
 PrintEnd(){
-echo -e "\n
+echo -e "\n\`\`\`sh
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⠤⠲⠦⠉⠉⠉⠏⠉⠒⢄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⢀⡠⠲⠃⢀⣤⠀⠀⠀⠲⠂⠀⠠⠆⠀⠙⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⢀⡔⠁⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -77,7 +77,7 @@ echo -e "\n
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⠿⠛⠛⠛⠛⠻⢿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⡰⢤⣀⣀⡄⢠⠞⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-"
+\`\`\`"
 }
 
 # ---------------------------------------------------------------------------
@@ -140,17 +140,7 @@ function GitStatus {
   fi
 }
 
-# for debuging purpose
-# function DebugHere {
-# printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' #
-# echo -e "\n$BG_RED$EXPND" "DEBUG" "$RST"
-# # echo -e "\n$BG_RED$EXPND""$(git log)""$RST"
-# printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' #
-# # before_merge=$(git log --pretty=format:"%H" -1)
-# echo -e "\n$BG_RED%s$EXPND" "$before_merge"
-# }
 
-# ! commented for testing purpose [START]
 
 # check if path exists and create stock it in a variable
 ensure_path() {
@@ -171,6 +161,7 @@ ensure_path() {
     # eval "${variable_name}='${input_path}'"
     echo -e "${input_path}"
 }
+
 
 # ! ENV [START]
 
@@ -294,7 +285,7 @@ git commit -m "init, added hello.sh" > /dev/null
 
 # ! generate and store First_Snapshot hastag <------------------------------------------------------------------<<<
 first_snapshot=$(git log --pretty=format:"%H" -1)
-printf "$RED%s$RST\n" "$(git log --pretty=format:"%H" -1)"
+# printf "$RED%s$RST\n" "$(git log --pretty=format:"%H" -1)"
 
 # * proof
 
@@ -994,6 +985,7 @@ PrintQ "Did the student successfully merge the changes from the main branch into
 
 # ! generate and store Before_merge hash <------------------------------------------------------------------<<<
 before_merge=$(git log --pretty=format:"%H" -1)
+# ! generate and store Before_merge hash <------------------------------------------------------------------<<<
 # switch to the greet branch
 PrintCmd "git switch greet"
 git switch greet
@@ -1253,8 +1245,8 @@ PrintQ "Did the student add a local branch named greet tracking the remote origi
 PrintCmd "git checkout -b greet"
 git checkout -b greet
 
-PrintCmd "git remote add -t greet hello $user_repo/hello"
-git remote add -t greet hello $user_repo/hello
+PrintCmd "git remote add -t greet hello ~/dev/git/work/hello"
+git remote add -t greet hello ~/dev/git/work/hello
 
 
 PrintQ "Did the student add a remote reference to their Git repository?"
@@ -1285,6 +1277,7 @@ echo -e "Opening now the remote repository, please check the result."
 # ! BUG?
 # xdg-open $remote_url
 
+# ? no need
 # PAUSE, resume the script after opening the repo in the browser
 # read -p "Open $remote_url"
 # read -p "Press any key to resume ..."
