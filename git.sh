@@ -141,14 +141,14 @@ function GitStatus {
 }
 
 # for debuging purpose
-function DebugHere {
-printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' #
-echo -e "\n$BG_RED$EXPND" "DEBUG" "$RST"
-# echo -e "\n$BG_RED$EXPND""$(git log)""$RST"
-printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' #
-# before_merge=$(git log --pretty=format:"%H" -1)
-echo -e "\n$BG_RED%s$EXPND" "$before_merge"
-}
+# function DebugHere {
+# printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' #
+# echo -e "\n$BG_RED$EXPND" "DEBUG" "$RST"
+# # echo -e "\n$BG_RED$EXPND""$(git log)""$RST"
+# printf '\n\e[32m%*s\e[0m\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' #
+# # before_merge=$(git log --pretty=format:"%H" -1)
+# echo -e "\n$BG_RED%s$EXPND" "$before_merge"
+# }
 
 # ! commented for testing purpose [START]
 
@@ -1253,8 +1253,8 @@ PrintQ "Did the student add a local branch named greet tracking the remote origi
 PrintCmd "git checkout -b greet"
 git checkout -b greet
 
-PrintCmd "git remote add -t greet hello ~/dev/git/work/hello"
-git remote add -t greet hello ~/dev/git/work/hello
+PrintCmd "git remote add -t greet hello $user_repo/hello"
+git remote add -t greet hello $user_repo/hello
 
 
 PrintQ "Did the student add a remote reference to their Git repository?"
@@ -1275,7 +1275,7 @@ if [ $full_script == 0 ]; then
   # exit 1
 else
   # echo -e "PRODUCTION MODE"
-  DebugHere # debug here
+  # DebugHere # debug here
   PrintCmd "git push -u --all origin"
   git push -u --all origin
 fi
