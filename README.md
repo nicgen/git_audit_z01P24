@@ -8,7 +8,7 @@
 Clone the repo and launch the script with 
 
 ```sh
-clone https://github.com/nicgen/git_audit_z01P24.git
+git clone https://github.com/nicgen/git_audit_z01P24.git
 cd git_audit_z01P24
 # rename .env_example to .env
 # fill the variables
